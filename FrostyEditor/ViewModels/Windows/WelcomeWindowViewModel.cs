@@ -70,15 +70,7 @@ public partial class WelcomeWindowViewModel : ObservableObject
 
             // TODO: Add image for these png, they are placeholder now
             // Assets/Profiles/Banners/
-            //     bf2042.png
-            //     deadspace.png
-            //     fifa21.png
-            //     fifa22.png
-            //     fifa23.png
             //     madden21.png
-            //     madden22.png
-            //     madden23.png
-            //     nfsunbound.png
         }
     }
 
