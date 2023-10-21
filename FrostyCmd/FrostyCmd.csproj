@@ -15,4 +15,8 @@
       <None Update="Profiles\*.json" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
+    <ItemGroup>
+      <EditorConfigFiles Include=".editorconfig" />
+    </ItemGroup>
+
 </Project>
