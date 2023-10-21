@@ -24,7 +24,7 @@
               <ItemsPanelTemplate>
                 <DockPanel DockProperties.IsDropArea="True"
                            Background="Transparent"
-                           LastChildFill="{Binding LastChildFill}"/>
+                           LastChildFill="{Binding LastChildFill}" />
               </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
           </ItemsControl>

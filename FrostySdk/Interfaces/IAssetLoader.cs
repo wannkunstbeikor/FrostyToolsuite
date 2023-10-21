@@ -3,7 +3,7 @@
 public interface IAssetLoader
 {
     /// <summary>
-    /// Loads SuperBundles.
+    ///     Loads SuperBundles.
     /// </summary>
     public void Load();
 }

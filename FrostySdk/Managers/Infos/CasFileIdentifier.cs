@@ -15,19 +15,20 @@ public readonly struct CasFileIdentifier
 
     public static CasFileIdentifier FromFileIdentifier(uint file1, uint file2)
     {
-        return new CasFileIdentifier(((file1 >> 16) & 0xFF) != 0, (int)(((file1 << 16) & 0xFFFF0000) | ((file2 >> 16) & 0xFFFF)), (int)((file2 >> 0) & 0xFFFF));
+        return new CasFileIdentifier(((file1 >> 16) & 0xFF) != 0,
+            (int)(((file1 << 16) & 0xFFFF0000) | ((file2 >> 16) & 0xFFFF)), (int)((file2 >> 0) & 0xFFFF));
     }
 
     public static uint ToFileIdentifier(CasFileIdentifier file)
     {
-        return (uint)((file.IsPatch ? 1 << 16 : 0) | (file.InstallChunkIndex << 8) | (file.CasIndex));
+        return (uint)((file.IsPatch ? 1 << 16 : 0) | (file.InstallChunkIndex << 8) | file.CasIndex);
     }
-    
+
     public static CasFileIdentifier FromFileIdentifierV2(uint file)
     {
         return new CasFileIdentifier((file & 0x100) != 0, (int)(file >> 12), (int)((file >> 0) & 0xFF) + 1);
     }
-    
+
     public CasFileIdentifier(bool inIsPatch, int inInstallChunkIndex, int inCasIndex)
     {
         IsPatch = inIsPatch;
@@ -35,14 +36,21 @@ public readonly struct CasFileIdentifier
         CasIndex = inCasIndex;
     }
 
-    public static bool operator ==(CasFileIdentifier a, CasFileIdentifier b) => a.Equals(b);
-    public static bool operator !=(CasFileIdentifier a, CasFileIdentifier b) => !a.Equals(b);
+    public static bool operator ==(CasFileIdentifier a, CasFileIdentifier b)
+    {
+        return a.Equals(b);
+    }
+
+    public static bool operator !=(CasFileIdentifier a, CasFileIdentifier b)
+    {
+        return !a.Equals(b);
+    }
 
     public bool Equals(CasFileIdentifier b)
     {
         return IsPatch == b.IsPatch && InstallChunkIndex == b.InstallChunkIndex && CasIndex == b.CasIndex;
     }
-    
+
     public override bool Equals(object? obj)
     {
         if (obj is not CasFileIdentifier b)

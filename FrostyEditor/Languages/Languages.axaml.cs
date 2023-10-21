@@ -17,6 +17,8 @@ public class LangEntry
 
     public override string ToString()
     {
-        return Lines != LanguageList.TotalLines ? $"{Name} ({Math.Floor((float)Lines / LanguageList.TotalLines * 100)}%)" : Name;
+        return Lines != LanguageList.TotalLines
+            ? $"{Name} ({Math.Floor((float)Lines / LanguageList.TotalLines * 100)}%)"
+            : Name;
     }
 }

@@ -6,7 +6,7 @@ internal class PrimitiveInfoData : TypeInfoData
 {
     public override void CreateType(StringBuilder sb)
     {
-        string actualType = string.Empty;
+        var actualType = string.Empty;
 
         switch (m_flags.GetTypeEnum())
         {

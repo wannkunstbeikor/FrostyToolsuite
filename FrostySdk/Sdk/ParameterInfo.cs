@@ -4,14 +4,25 @@ namespace Frosty.Sdk.Sdk;
 
 internal class ParameterInfo
 {
-    public string GetName() => m_name;
-    public TypeInfo GetTypeInfo() => TypeInfo.TypeInfoMapping[p_typeInfo];
-    public byte GetParameterType() => m_type;
-
     private string m_name = string.Empty;
-    private long p_typeInfo;
     private byte m_type;
     private long p_defaultValue;
+    private long p_typeInfo;
+
+    public string GetName()
+    {
+        return m_name;
+    }
+
+    public TypeInfo GetTypeInfo()
+    {
+        return TypeInfo.TypeInfoMapping[p_typeInfo];
+    }
+
+    public byte GetParameterType()
+    {
+        return m_type;
+    }
 
     public void Read(MemoryReader reader)
     {
@@ -23,6 +34,5 @@ internal class ParameterInfo
 
     public void ProcessDefaultValue()
     {
-
     }
 }

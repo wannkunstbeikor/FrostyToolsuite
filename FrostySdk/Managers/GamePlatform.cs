@@ -3,32 +3,39 @@ namespace Frosty.Sdk.Managers;
 public enum GamePlatform
 {
     Invalid = -1,
+
     /// <summary>
-    /// Windows
+    ///     Windows
     /// </summary>
     Win32,
+
     /// <summary>
-    /// Linux
+    ///     Linux
     /// </summary>
     Linux,
+
     /// <summary>
-    /// Xbox 360
+    ///     Xbox 360
     /// </summary>
     Xenon,
+
     /// <summary>
-    /// Xbox One
+    ///     Xbox One
     /// </summary>
     Gen4a,
+
     /// <summary>
-    /// Playstation 3
+    ///     Playstation 3
     /// </summary>
     Ps3,
+
     /// <summary>
-    /// Playstation 4
+    ///     Playstation 4
     /// </summary>
     Gen4b,
+
     /// <summary>
-    /// Nintendo Switch
+    ///     Nintendo Switch
     /// </summary>
     Nx
 }

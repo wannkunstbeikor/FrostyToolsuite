@@ -2,13 +2,13 @@
 
 public class SuperBundleEntry
 {
-    /// <summary>
-    /// The name of this <see cref="SuperBundleEntry"/>.
-    /// </summary>
-    public string Name { get; }
-
     public SuperBundleEntry(string inName)
     {
         Name = inName;
     }
+
+    /// <summary>
+    ///     The name of this <see cref="SuperBundleEntry" />.
+    /// </summary>
+    public string Name { get; }
 }

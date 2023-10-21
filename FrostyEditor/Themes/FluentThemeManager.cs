@@ -19,18 +19,12 @@ public class FluentThemeManager : IThemeManager
 
     private static readonly Styles s_fluentDark = new()
     {
-        new StyleInclude(s_baseUri)
-        {
-            Source = new Uri("avares://FrostyEditor/Themes/FluentDark.axaml")
-        }
+        new StyleInclude(s_baseUri) { Source = new Uri("avares://FrostyEditor/Themes/FluentDark.axaml") }
     };
 
     private static readonly Styles s_fluentLight = new()
     {
-        new StyleInclude(s_baseUri)
-        {
-            Source = new Uri("avares://FrostyEditor/Themes/FluentLight.axaml")
-        }
+        new StyleInclude(s_baseUri) { Source = new Uri("avares://FrostyEditor/Themes/FluentLight.axaml") }
     };
 
     public void Switch(int index)

@@ -2,7 +2,7 @@
   "Name": "GW2.Main_Win64_Retail",
   "DisplayName": "Plants vs Zombies™ Garden Warfare 2",
   "InternalName": "pvz2",
-  "TypeInfoSignature" : "",
+  "TypeInfoSignature": "",
   "HasStrippedTypeNames": false,
   "DataVersion": 20160222,
   "FrostbiteVersion": "2014.4.11",

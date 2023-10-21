@@ -9,7 +9,7 @@
     <Setter Property="Template">
       <ControlTemplate>
         <DockableControl TrackingMode="Visible">
-          <ContentControl Content="{Binding}" 
+          <ContentControl Content="{Binding}"
                           ContentTemplate="{Binding}" />
         </DockableControl>
       </ControlTemplate>

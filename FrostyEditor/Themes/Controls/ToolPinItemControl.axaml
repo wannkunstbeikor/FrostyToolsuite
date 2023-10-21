@@ -9,15 +9,15 @@
     <MenuItem Header="_Float"
               Command="{Binding Owner.Factory.FloatDockable}"
               CommandParameter="{Binding}"
-              IsVisible="{Binding CanFloat}"/>
+              IsVisible="{Binding CanFloat}" />
     <MenuItem Header="_Show"
               Command="{Binding Owner.Factory.PinDockable}"
               CommandParameter="{Binding}"
-              IsVisible="{Binding CanPin}"/>
+              IsVisible="{Binding CanPin}" />
     <MenuItem Header="_Close"
               Command="{Binding Owner.Factory.CloseDockable}"
               CommandParameter="{Binding}"
-              IsVisible="{Binding CanClose}"/>
+              IsVisible="{Binding CanClose}" />
   </ContextMenu>
 
   <ControlTheme x:Key="{x:Type ToolPinItemControl}" TargetType="ToolPinItemControl">
@@ -38,8 +38,7 @@
               <TextBlock Text="{Binding Title}"
                          VerticalAlignment="Center"
                          HorizontalAlignment="Left"
-                         ContextMenu="{DynamicResource ToolPinItemControlContextMenu}">
-              </TextBlock>
+                         ContextMenu="{DynamicResource ToolPinItemControlContextMenu}" />
             </Button>
           </LayoutTransformControl>
         </DockableControl>

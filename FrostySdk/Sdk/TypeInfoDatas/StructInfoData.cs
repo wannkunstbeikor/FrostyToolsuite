@@ -8,7 +8,7 @@ namespace Frosty.Sdk.Sdk.TypeInfoDatas;
 
 internal class StructInfoData : TypeInfoData
 {
-    private List<FieldInfo> m_fieldInfos = new List<FieldInfo>();
+    private readonly List<FieldInfo> m_fieldInfos = new();
 
     public override void Read(MemoryReader reader)
     {
@@ -34,11 +34,11 @@ internal class StructInfoData : TypeInfoData
             }
         }
 
-        long pDefaultValue = reader.ReadLong();
-        long pFieldInfos = reader.ReadLong();
+        var pDefaultValue = reader.ReadLong();
+        var pFieldInfos = reader.ReadLong();
 
         reader.Position = pFieldInfos;
-        for (int i = 0; i < m_fieldCount; i++)
+        for (var i = 0; i < m_fieldCount; i++)
         {
             m_fieldInfos.Add(new FieldInfo());
             m_fieldInfos[i].Read(reader, m_nameHash);
@@ -53,7 +53,7 @@ internal class StructInfoData : TypeInfoData
             sb.AppendLine($"public partial struct {m_name[..m_name.IndexOf("::", StringComparison.Ordinal)]}");
             sb.AppendLine("{");
         }
-        
+
         base.CreateType(sb);
 
         sb.AppendLine($"public partial struct {CleanUpName()}");
@@ -61,14 +61,14 @@ internal class StructInfoData : TypeInfoData
         sb.AppendLine("{");
 
         m_fieldInfos.Sort();
-        for (int i = 0; i < m_fieldInfos.Count; i++)
+        for (var i = 0; i < m_fieldInfos.Count; i++)
         {
             sb.AppendLine($"[{nameof(FieldIndexAttribute)}({i})]");
             m_fieldInfos[i].CreateField(sb);
         }
-        
+
         sb.AppendLine("}");
-        
+
         if (m_name.Contains("::"))
         {
             sb.AppendLine("}");

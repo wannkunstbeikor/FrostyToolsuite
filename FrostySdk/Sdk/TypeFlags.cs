@@ -35,7 +35,7 @@ public struct TypeFlags
         Interface = 0x1B,
         Delegate = 0x1C
     }
-    
+
     public enum CategoryEnum
     {
         None = 0,
@@ -70,21 +70,35 @@ public struct TypeFlags
 
     public TypeFlags(TypeEnum type, CategoryEnum category = CategoryEnum.None)
     {
-        m_flags = (ushort)((ushort)type << 4 | (ushort)category);
+        m_flags = (ushort)(((ushort)type << 4) | (ushort)category);
         if (ProfilesLibrary.EbxVersion != 2)
         {
             m_flags <<= 1;
         }
     }
 
-    public TypeEnum GetTypeEnum() => (TypeEnum)((m_flags >> (ProfilesLibrary.EbxVersion == 2 ? 4 : 5)) & 0x1F);
-    
-    public CategoryEnum GetCategoryEnum() => (CategoryEnum)((m_flags >> (ProfilesLibrary.EbxVersion == 2 ? 0 : 1)) & 0xF);
+    public TypeEnum GetTypeEnum()
+    {
+        return (TypeEnum)((m_flags >> (ProfilesLibrary.EbxVersion == 2 ? 4 : 5)) & 0x1F);
+    }
 
-    public Flags GetFlags() => (Flags)(m_flags & (ProfilesLibrary.EbxVersion == 2 ? 0x1FF : 0x3FF));
+    public CategoryEnum GetCategoryEnum()
+    {
+        return (CategoryEnum)((m_flags >> (ProfilesLibrary.EbxVersion == 2 ? 0 : 1)) & 0xF);
+    }
 
-    public static implicit operator ushort(TypeFlags value) => value.m_flags;
-    
-    public static implicit operator TypeFlags(ushort value) => new(value);
+    public Flags GetFlags()
+    {
+        return (Flags)(m_flags & (ProfilesLibrary.EbxVersion == 2 ? 0x1FF : 0x3FF));
+    }
 
+    public static implicit operator ushort(TypeFlags value)
+    {
+        return value.m_flags;
+    }
+
+    public static implicit operator TypeFlags(ushort value)
+    {
+        return new TypeFlags(value);
+    }
 }

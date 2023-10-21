@@ -1,62 +1,20 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using Frosty.Sdk.Ebx;
 
 namespace Frosty.Sdk.IO.Ebx;
 
-public partial class EbxAsset
+public class EbxAsset
 {
-    public Guid FileGuid => fileGuid;
-    public Guid RootInstanceGuid
-    {
-        get
-        {
-            AssetClassGuid guid = ((dynamic)RootObject).GetInstanceGuid();
-            return guid.ExportedGuid;
-        }
-    }
-
-    public IEnumerable<Guid> Dependencies
-    {
-        get
-        {
-            foreach (Guid dependency in dependencies)
-            {
-                yield return dependency;
-            }
-        }
-    }
-    public IEnumerable<object> Objects
-    {
-        get
-        {
-            for (int i = 0; i < objects.Count; i++)
-                yield return objects[i];
-        }
-    }
-    public IEnumerable<object> ExportedObjects
-    {
-        get
-        {
-            for (int i = 0; i < objects.Count; i++)
-            {
-                dynamic obj = objects[i];
-                AssetClassGuid guid = obj.GetInstanceGuid();
-                if (guid.IsExported)
-                {
-                    yield return obj;
-                }
-            }
-        }
-    }
-    public object RootObject => objects[0];
-    public bool IsValid => objects.Count != 0;
-    public bool TransientEdit { get; set; }
+    private static readonly Type s_pointerType = typeof(PointerRef);
+    private static readonly Type s_valueType = typeof(ValueType);
+    private static readonly Type s_boxedValueType = typeof(BoxedValueRef);
+    internal HashSet<Guid> dependencies = new();
 
     internal Guid fileGuid;
     internal List<object> objects = new();
-    internal HashSet<Guid> dependencies = new();
 
     public EbxAsset()
     {
@@ -73,8 +31,61 @@ public partial class EbxAsset
         }
     }
 
+    public Guid FileGuid => fileGuid;
+
+    public Guid RootInstanceGuid
+    {
+        get
+        {
+            AssetClassGuid guid = ((dynamic)RootObject).GetInstanceGuid();
+            return guid.ExportedGuid;
+        }
+    }
+
+    public IEnumerable<Guid> Dependencies
+    {
+        get
+        {
+            foreach (var dependency in dependencies)
+            {
+                yield return dependency;
+            }
+        }
+    }
+
+    public IEnumerable<object> Objects
+    {
+        get
+        {
+            for (var i = 0; i < objects.Count; i++)
+            {
+                yield return objects[i];
+            }
+        }
+    }
+
+    public IEnumerable<object> ExportedObjects
+    {
+        get
+        {
+            for (var i = 0; i < objects.Count; i++)
+            {
+                dynamic obj = objects[i];
+                AssetClassGuid guid = obj.GetInstanceGuid();
+                if (guid.IsExported)
+                {
+                    yield return obj;
+                }
+            }
+        }
+    }
+
+    public object RootObject => objects[0];
+    public bool IsValid => objects.Count != 0;
+    public bool TransientEdit { get; set; }
+
     /// <summary>
-    /// Invoked when loading of the ebx asset has completed, to allow for any custom handling
+    ///     Invoked when loading of the ebx asset has completed, to allow for any custom handling
     /// </summary>
     public virtual void OnLoadComplete()
     {
@@ -89,6 +100,7 @@ public partial class EbxAsset
                 return obj;
             }
         }
+
         return null;
     }
 
@@ -103,7 +115,10 @@ public partial class EbxAsset
         return true;
     }
 
-    public void SetFileGuid(Guid guid) => fileGuid = guid;
+    public void SetFileGuid(Guid guid)
+    {
+        fileGuid = guid;
+    }
 
     public void AddObject(dynamic obj, bool root = false)
     {
@@ -120,7 +135,7 @@ public partial class EbxAsset
 
     public void RemoveObject(object obj)
     {
-        int idx = objects.IndexOf(obj);
+        var idx = objects.IndexOf(obj);
         if (idx == -1)
         {
             return;
@@ -132,7 +147,7 @@ public partial class EbxAsset
     public void Update()
     {
         dependencies.Clear();
-        
+
         List<Tuple<PropertyInfo, object>> refProps = new();
         List<Tuple<object, Guid>> externalProps = new();
         List<object> objsToProcess = new();
@@ -155,12 +170,12 @@ public partial class EbxAsset
         }
 
         // check for invalid references, and clear them
-        foreach (Tuple<PropertyInfo, object> refProp in refProps)
+        foreach (var refProp in refProps)
         {
-            Type pType = refProp.Item1.PropertyType;
+            var pType = refProp.Item1.PropertyType;
             if (pType == s_pointerType)
             {
-                PointerRef pr = (PointerRef)refProp.Item1.GetValue(refProp.Item2)!;
+                var pr = (PointerRef)refProp.Item1.GetValue(refProp.Item2)!;
                 if (!objects.Contains(pr.Internal!))
                 {
                     refProp.Item1.SetValue(refProp.Item2, new PointerRef());
@@ -168,13 +183,13 @@ public partial class EbxAsset
             }
             else
             {
-                System.Collections.IList list = (System.Collections.IList)refProp.Item1.GetValue(refProp.Item2)!;
-                int count = list.Count;
-                bool requiresChange = false;
+                var list = (IList)refProp.Item1.GetValue(refProp.Item2)!;
+                var count = list.Count;
+                var requiresChange = false;
 
-                for (int i = 0; i < count; i++)
+                for (var i = 0; i < count; i++)
                 {
-                    PointerRef pr = (PointerRef)list[i]!;
+                    var pr = (PointerRef)list[i]!;
                     if (pr.Type == PointerRefType.Internal)
                     {
                         if (!objects.Contains(pr.Internal!))
@@ -193,14 +208,11 @@ public partial class EbxAsset
         }
     }
 
-    private static readonly Type s_pointerType = typeof(PointerRef);
-    private static readonly Type s_valueType = typeof(ValueType);
-    private static readonly Type s_boxedValueType = typeof(BoxedValueRef);
-
-    private void CountRefs(object obj, object classObj, ref List<Tuple<PropertyInfo, object>> refProps, ref List<Tuple<object, Guid>> externalProps)
+    private void CountRefs(object obj, object classObj, ref List<Tuple<PropertyInfo, object>> refProps,
+        ref List<Tuple<object, Guid>> externalProps)
     {
-        PropertyInfo[] pis = obj.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
-        foreach (PropertyInfo pi in pis)
+        var pis = obj.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
+        foreach (var pi in pis)
         {
             if (pi.PropertyType.IsPrimitive)
             {
@@ -212,12 +224,12 @@ public partial class EbxAsset
                 continue;
             }
 
-            Type pType = pi.PropertyType;
+            var pType = pi.PropertyType;
 
             // Pointers
             if (pType == s_pointerType)
             {
-                PointerRef pr = (PointerRef)pi.GetValue(obj)!;
+                var pr = (PointerRef)pi.GetValue(obj)!;
                 if (pr.Type == PointerRefType.Internal)
                 {
                     // collect reference for later checking
@@ -232,20 +244,20 @@ public partial class EbxAsset
             // Arrays
             else if (pType.GenericTypeArguments.Length != 0)
             {
-                Type arrayType = pType.GenericTypeArguments[0];
+                var arrayType = pType.GenericTypeArguments[0];
 
-                System.Collections.IList list = (System.Collections.IList)pi.GetValue(obj)!;
-                int count = list.Count;
+                var list = (IList)pi.GetValue(obj)!;
+                var count = list.Count;
 
                 if (count > 0)
                 {
                     // Pointer Array
                     if (arrayType == s_pointerType)
                     {
-                        for (int i = 0; i < count; i++)
+                        for (var i = 0; i < count; i++)
                         {
-                            List<PointerRef> plist = (List<PointerRef>)list;
-                            PointerRef pr = plist[i];
+                            var plist = (List<PointerRef>)list;
+                            var pr = plist[i];
 
                             if (pr.Type == PointerRefType.Internal)
                             {
@@ -261,7 +273,7 @@ public partial class EbxAsset
                     // Structure Array
                     else if (arrayType != s_valueType)
                     {
-                        for (int i = 0; i < count; i++)
+                        for (var i = 0; i < count; i++)
                         {
                             CountRefs(list[i]!, classObj, ref refProps, ref externalProps);
                         }
@@ -271,7 +283,7 @@ public partial class EbxAsset
 
             else if (pType == s_boxedValueType)
             {
-                BoxedValueRef boxedValue = (pi.GetValue(obj) as BoxedValueRef)!;
+                var boxedValue = (pi.GetValue(obj) as BoxedValueRef)!;
                 if (boxedValue.Value != null)
                 {
                     CountRefs(boxedValue.Value, classObj, ref refProps, ref externalProps);

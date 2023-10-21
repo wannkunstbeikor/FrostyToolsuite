@@ -6,7 +6,7 @@ namespace Frosty.Sdk.Sdk.TypeInfoDatas;
 
 internal class EnumInfoData : TypeInfoData
 {
-    private List<FieldInfo> m_fieldInfos = new();
+    private readonly List<FieldInfo> m_fieldInfos = new();
 
     public override void Read(MemoryReader reader)
     {
@@ -17,10 +17,10 @@ internal class EnumInfoData : TypeInfoData
             m_name = $"Enum_{m_nameHash:x8}";
         }
 
-        long pFieldInfos = reader.ReadLong();
+        var pFieldInfos = reader.ReadLong();
 
         reader.Position = pFieldInfos;
-        for (int i = 0; i < m_fieldCount; i++)
+        for (var i = 0; i < m_fieldCount; i++)
         {
             m_fieldInfos.Add(new FieldInfo());
             m_fieldInfos[i].Read(reader, m_nameHash);
@@ -35,7 +35,7 @@ internal class EnumInfoData : TypeInfoData
 
         sb.AppendLine("{");
 
-        foreach (FieldInfo fieldInfo in m_fieldInfos)
+        foreach (var fieldInfo in m_fieldInfos)
         {
             sb.AppendLine($"{fieldInfo.GetName()} = {fieldInfo.GetEnumValue()},");
         }

@@ -2,8 +2,8 @@
 
 internal class EbxTypeResolver
 {
-    private readonly EbxTypeDescriptor[] m_typeDescriptors;
     private readonly EbxFieldDescriptor[] m_fieldDescriptors;
+    private readonly EbxTypeDescriptor[] m_typeDescriptors;
 
     internal EbxTypeResolver(EbxTypeDescriptor[] inTypeDescriptors, EbxFieldDescriptor[] inFieldDescriptors)
     {
@@ -14,7 +14,7 @@ internal class EbxTypeResolver
 
     public EbxTypeDescriptor ResolveType(int index)
     {
-        EbxTypeDescriptor typeDescriptor = m_typeDescriptors[index];
+        var typeDescriptor = m_typeDescriptors[index];
         if (typeDescriptor.IsSharedTypeDescriptorKey())
         {
             return EbxSharedTypeDescriptors.GetTypeDescriptor(typeDescriptor.ToKey());

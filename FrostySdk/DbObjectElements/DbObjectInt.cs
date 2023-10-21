@@ -16,7 +16,7 @@ public class DbObjectInt : DbObject
     {
         m_value = inValue;
     }
-    
+
     public DbObjectInt(string inName, int inValue)
         : base(Type.Int, inName)
     {

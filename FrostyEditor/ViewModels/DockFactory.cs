@@ -13,24 +13,20 @@ namespace FrostyEditor.ViewModels;
 
 public class DockFactory : Factory
 {
-    private IRootDock? m_rootDock;
     private IDocumentDock? m_documentDock;
     private ITool? m_findTool;
+    private IRootDock? m_rootDock;
 
-    public override IDocumentDock CreateDocumentDock() => new FilesDocumentDock();
+    public override IDocumentDock CreateDocumentDock()
+    {
+        return new FilesDocumentDock();
+    }
 
     public override IRootDock CreateLayout()
     {
-        DefaultPageViewModel untitledFileViewModel = new()
-        {
-            Title = "Home"
-        };
+        DefaultPageViewModel untitledFileViewModel = new() { Title = "Home" };
 
-        DataExplorerViewModel dataExplorerViewModel = new()
-        {
-            Id = "Data Explorer",
-            Title = "Data Explorer"
-        };
+        DataExplorerViewModel dataExplorerViewModel = new() { Id = "Data Explorer", Title = "Data Explorer" };
 
         FilesDocumentDock documentDock = new()
         {
@@ -65,7 +61,7 @@ public class DockFactory : Factory
             )
         };
 
-        IRootDock windowLayout = CreateRootDock();
+        var windowLayout = CreateRootDock();
         windowLayout.Title = "Default";
         ProportionalDock windowLayoutContent = new()
         {
@@ -82,7 +78,7 @@ public class DockFactory : Factory
         windowLayout.VisibleDockables = CreateList<IDockable>(windowLayoutContent);
         windowLayout.ActiveDockable = windowLayoutContent;
 
-        IRootDock rootDock = CreateRootDock();
+        var rootDock = CreateRootDock();
 
         rootDock.IsCollapsable = false;
         rootDock.VisibleDockables = CreateList<IDockable>(windowLayout);
@@ -98,16 +94,11 @@ public class DockFactory : Factory
 
     public override void InitLayout(IDockable layout)
     {
-        ContextLocator = new Dictionary<string, Func<object?>>
-        {
-            ["Find"] = () => layout
-        };
+        ContextLocator = new Dictionary<string, Func<object?>> { ["Find"] = () => layout };
 
         DockableLocator = new Dictionary<string, Func<IDockable?>>
         {
-            ["Root"] = () => m_rootDock,
-            ["Files"] = () => m_documentDock,
-            ["Data Explorer"] = () => m_findTool
+            ["Root"] = () => m_rootDock, ["Files"] = () => m_documentDock, ["Data Explorer"] = () => m_findTool
         };
 
         HostWindowLocator = new Dictionary<string, Func<IHostWindow?>>

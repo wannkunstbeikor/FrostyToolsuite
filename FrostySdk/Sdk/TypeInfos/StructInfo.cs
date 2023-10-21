@@ -9,4 +9,3 @@ internal class StructInfo : TypeInfo
     {
     }
 }
-

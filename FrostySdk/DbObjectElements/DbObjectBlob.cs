@@ -18,7 +18,7 @@ public class DbObjectBlob : DbObject
     {
         m_value = inValue;
     }
-    
+
     public DbObjectBlob(string inName, byte[] inValue)
         : base(Type.Blob, inName)
     {
@@ -38,7 +38,7 @@ public class DbObjectBlob : DbObject
 
     protected override void InternalDeserialize(DataStream stream)
     {
-        int length = stream.Read7BitEncodedInt32();
+        var length = stream.Read7BitEncodedInt32();
         m_value = new byte[length];
         stream.ReadExactly(m_value);
     }

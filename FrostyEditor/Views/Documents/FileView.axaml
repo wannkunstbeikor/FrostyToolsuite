@@ -5,6 +5,5 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d"
              d:DesignWidth="300" d:DesignHeight="400">
-  <Grid Focusable="True">
-  </Grid>
+  <Grid Focusable="True" />
 </UserControl>

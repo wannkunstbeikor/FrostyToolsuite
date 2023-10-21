@@ -11,33 +11,22 @@ namespace Frosty.Sdk.IO;
 
 public class BinaryBundle
 {
-    private enum Magic : uint
-    {
-        Standard = 0xED1CEDB8,
-        Kelvin = 0xC3889333,
-        Encrypted = 0xC3E5D5C3
-    }
- 
-    public EbxAssetEntry[] EbxList { get; }
-    public ResAssetEntry[] ResList { get; }
-    public ChunkAssetEntry[] ChunkList { get; }
-
     private BinaryBundle(DataStream stream)
     {
         // we use big endian for default
-        Endian endian = Endian.Big;
-        
-        uint size = stream.ReadUInt32(Endian.Big);
+        var endian = Endian.Big;
 
-        long startPos = stream.Position;
-        
-        Magic magic = (Magic)(stream.ReadUInt32(endian) ^ GetSalt());
+        var size = stream.ReadUInt32(Endian.Big);
+
+        var startPos = stream.Position;
+
+        var magic = (Magic)(stream.ReadUInt32(endian) ^ GetSalt());
 
         // check what endian its written in
         if (!IsValidMagic(magic))
         {
             endian = Endian.Little;
-            uint value = (uint)magic ^ GetSalt();
+            var value = (uint)magic ^ GetSalt();
             magic = (Magic)(BinaryPrimitives.ReverseEndianness(value) ^ GetSalt());
 
             if (!IsValidMagic(magic))
@@ -46,20 +35,20 @@ public class BinaryBundle
             }
         }
 
-        bool containsSha1 = magic == Magic.Standard;
+        var containsSha1 = magic == Magic.Standard;
 
-        uint totalCount = stream.ReadUInt32(endian);
-        int ebxCount = stream.ReadInt32(endian);
-        int resCount = stream.ReadInt32(endian);
-        int chunkCount = stream.ReadInt32(endian);
-        long stringsOffset = stream.ReadUInt32(endian) + (magic == Magic.Encrypted ? 0 : startPos);
+        var totalCount = stream.ReadUInt32(endian);
+        var ebxCount = stream.ReadInt32(endian);
+        var resCount = stream.ReadInt32(endian);
+        var chunkCount = stream.ReadInt32(endian);
+        var stringsOffset = stream.ReadUInt32(endian) + (magic == Magic.Encrypted ? 0 : startPos);
         stream.Position += sizeof(uint) + sizeof(int); // metaOffset + metaSize
 
         EbxList = new EbxAssetEntry[ebxCount];
         ResList = new ResAssetEntry[resCount];
         ChunkList = new ChunkAssetEntry[chunkCount];
 
-        Sha1[] sha1 = new Sha1[totalCount];
+        var sha1 = new Sha1[totalCount];
 
         // decrypt the data
         if (magic == Magic.Encrypted)
@@ -68,58 +57,60 @@ public class BinaryBundle
             {
                 throw new Exception();
             }
+
             blockStream.Decrypt(KeyManager.GetKey("BundleEncryptionKey"), (int)(size - 0x20), PaddingMode.None);
         }
-        
+
         // read sha1s
-        for (int i = 0; i < totalCount; i++)
+        for (var i = 0; i < totalCount; i++)
         {
             sha1[i] = containsSha1 ? stream.ReadSha1() : Sha1.Zero;
         }
 
-        int j = 0;
-        for (int i = 0; i < ebxCount; i++, j++)
+        var j = 0;
+        for (var i = 0; i < ebxCount; i++, j++)
         {
-            uint nameOffset = stream.ReadUInt32(endian);
-            uint originalSize = stream.ReadUInt32(endian);
+            var nameOffset = stream.ReadUInt32(endian);
+            var originalSize = stream.ReadUInt32(endian);
 
-            long currentPos = stream.Position;
+            var currentPos = stream.Position;
             stream.Position = stringsOffset + nameOffset;
-            string name = stream.ReadNullTerminatedString();
+            var name = stream.ReadNullTerminatedString();
 
             EbxList[i] = new EbxAssetEntry(name, sha1[j], -1, originalSize);
 
             stream.Position = currentPos;
         }
 
-        long resTypeOffset = stream.Position + resCount * 2 * sizeof(uint);
-        long resMetaOffset = stream.Position + resCount * 2 * sizeof(uint) + resCount * sizeof(uint);
-        long resRidOffset = stream.Position + resCount * 2 * sizeof(uint) + resCount * sizeof(uint) + resCount * 0x10;
-        for (int i = 0; i < resCount; i++, j++)
+        var resTypeOffset = stream.Position + (resCount * 2 * sizeof(uint));
+        var resMetaOffset = stream.Position + (resCount * 2 * sizeof(uint)) + (resCount * sizeof(uint));
+        var resRidOffset = stream.Position + (resCount * 2 * sizeof(uint)) + (resCount * sizeof(uint)) +
+                           (resCount * 0x10);
+        for (var i = 0; i < resCount; i++, j++)
         {
-            uint nameOffset = stream.ReadUInt32(endian);
-            uint originalSize = stream.ReadUInt32(endian);
+            var nameOffset = stream.ReadUInt32(endian);
+            var originalSize = stream.ReadUInt32(endian);
 
-            long currentPos = stream.Position;
+            var currentPos = stream.Position;
             stream.Position = stringsOffset + nameOffset;
-            string name = stream.ReadNullTerminatedString();
+            var name = stream.ReadNullTerminatedString();
 
-            stream.Position = resTypeOffset + i * sizeof(uint);
-            uint resType = stream.ReadUInt32();
-            
-            stream.Position = resMetaOffset + i * 0x10;
-            byte[] resMeta = stream.ReadBytes(0x10);
-            
-            stream.Position = resRidOffset + i * sizeof(ulong);
-            ulong resRid = stream.ReadUInt64();
+            stream.Position = resTypeOffset + (i * sizeof(uint));
+            var resType = stream.ReadUInt32();
+
+            stream.Position = resMetaOffset + (i * 0x10);
+            var resMeta = stream.ReadBytes(0x10);
+
+            stream.Position = resRidOffset + (i * sizeof(ulong));
+            var resRid = stream.ReadUInt64();
 
             ResList[i] = new ResAssetEntry(name, sha1[j], -1, originalSize, resRid, resType, resMeta);
 
             stream.Position = currentPos;
         }
 
-        stream.Position = resRidOffset + resCount * sizeof(ulong);
-        for (int i = 0; i < chunkCount; i++, j++)
+        stream.Position = resRidOffset + (resCount * sizeof(ulong));
+        for (var i = 0; i < chunkCount; i++, j++)
         {
             ChunkList[i] = new ChunkAssetEntry(stream.ReadGuid(endian), sha1[j], -1, stream.ReadUInt32(endian),
                 stream.ReadUInt32(endian));
@@ -128,11 +119,15 @@ public class BinaryBundle
         // we need to set the correct position, since the string table comes after the meta
         stream.Position = startPos + size;
     }
-    
+
+    public EbxAssetEntry[] EbxList { get; }
+    public ResAssetEntry[] ResList { get; }
+    public ChunkAssetEntry[] ChunkList { get; }
+
     /// <summary>
-    /// Dependent on the FB version, games use different salts.
-    /// If the game uses a version newer than 2017 it uses "pecn", else it uses "pecm".
-    /// <see cref="ProfileVersion.Battlefield5"/> is the only game that uses "arie".
+    ///     Dependent on the FB version, games use different salts.
+    ///     If the game uses a version newer than 2017 it uses "pecn", else it uses "pecm".
+    ///     <see cref="ProfileVersion.Battlefield5" /> is the only game that uses "arie".
     /// </summary>
     /// <returns>The salt, that the current game uses.</returns>
     private static uint GetSalt()
@@ -155,7 +150,7 @@ public class BinaryBundle
     }
 
     /// <summary>
-    /// Only the games using the <see cref="KelvinAssetLoader"/> use a different Magic than <see cref="Magic.Standard"/>.
+    ///     Only the games using the <see cref="KelvinAssetLoader" /> use a different Magic than <see cref="Magic.Standard" />.
     /// </summary>
     /// <returns>The magic the current game uses.</returns>
     private static Magic GetMagic()
@@ -169,17 +164,26 @@ public class BinaryBundle
         }
     }
 
-    private static bool IsValidMagic(Magic magic) =>
-        magic == Magic.Standard || magic == Magic.Kelvin || magic == Magic.Encrypted;
-    
+    private static bool IsValidMagic(Magic magic)
+    {
+        return magic == Magic.Standard || magic == Magic.Kelvin || magic == Magic.Encrypted;
+    }
+
     /// <summary>
-    /// Deserialize a binary stored bundle as <see cref="DbObject"/>.
+    ///     Deserialize a binary stored bundle as <see cref="DbObject" />.
     /// </summary>
-    /// <param name="stream">The <see cref="DataStream"/> from which the bundle should be Deserialized from.</param>
+    /// <param name="stream">The <see cref="DataStream" /> from which the bundle should be Deserialized from.</param>
     /// <returns></returns>
-    /// <exception cref="InvalidDataException">Is thrown when there is no valid <see cref="Magic"/>.</exception>
+    /// <exception cref="InvalidDataException">Is thrown when there is no valid <see cref="Magic" />.</exception>
     public static BinaryBundle Deserialize(DataStream stream)
     {
         return new BinaryBundle(stream);
+    }
+
+    private enum Magic : uint
+    {
+        Standard = 0xED1CEDB8,
+        Kelvin = 0xC3889333,
+        Encrypted = 0xC3E5D5C3
     }
 }

@@ -7,15 +7,9 @@ namespace Frosty.Sdk.Sdk.TypeInfoDatas;
 
 internal class FunctionInfoData : TypeInfoData
 {
-    private enum Modifier
-    {
-        None,
-        Virtual,
-        Override
-    }
-
-    private List<ParameterInfo> m_parameterInfos = new();
     private Modifier m_modifier;
+
+    private readonly List<ParameterInfo> m_parameterInfos = new();
 
     public override void Read(MemoryReader reader)
     {
@@ -32,11 +26,11 @@ internal class FunctionInfoData : TypeInfoData
         reader.ReadLong();
         reader.ReadLong();
 
-        long pParameterInfos = reader.ReadLong();
+        var pParameterInfos = reader.ReadLong();
         m_modifier = (Modifier)reader.ReadInt();
 
         reader.Position = pParameterInfos;
-        for (int i = 0; i < m_fieldCount; i++)
+        for (var i = 0; i < m_fieldCount; i++)
         {
             m_parameterInfos.Add(new ParameterInfo());
             m_parameterInfos[i].Read(reader);
@@ -47,16 +41,16 @@ internal class FunctionInfoData : TypeInfoData
     {
         base.CreateType(sb);
 
-        string returnType = "void";
+        var returnType = "void";
 
         StringBuilder inputParams = new();
-        bool hasReturn = false;
+        var hasReturn = false;
 
-        foreach (ParameterInfo parameterInfo in m_parameterInfos)
+        foreach (var parameterInfo in m_parameterInfos)
         {
-            TypeInfo type = parameterInfo.GetTypeInfo();
+            var type = parameterInfo.GetTypeInfo();
 
-            string typeName = type.GetName();
+            var typeName = type.GetName();
 
             if (type is ArrayInfo array)
             {
@@ -73,10 +67,7 @@ internal class FunctionInfoData : TypeInfoData
                     {
                         hasReturn = true;
                     }
-                    else
-                    {
 
-                    }
                     returnType = typeName;
                     break;
                 case 2:
@@ -87,10 +78,7 @@ internal class FunctionInfoData : TypeInfoData
                     {
                         hasReturn = true;
                     }
-                    else
-                    {
 
-                    }
                     returnType = $"{typeName}*";
                     break;
             }
@@ -101,12 +89,20 @@ internal class FunctionInfoData : TypeInfoData
             inputParams.Remove(inputParams.Length - 2, 2);
         }
 
-        sb.AppendLine($"public unsafe{(m_modifier == Modifier.Virtual ? " virtual": m_modifier == Modifier.Override ? " override" : "")} {returnType} {m_name} ({inputParams})");
+        sb.AppendLine(
+            $"public unsafe{(m_modifier == Modifier.Virtual ? " virtual" : m_modifier == Modifier.Override ? " override" : "")} {returnType} {m_name} ({inputParams})");
 
         sb.AppendLine("{");
 
         sb.AppendLine("throw new NotSupportedException(\"Calling functions is not supported.\");");
 
         sb.AppendLine("}");
+    }
+
+    private enum Modifier
+    {
+        None,
+        Virtual,
+        Override
     }
 }

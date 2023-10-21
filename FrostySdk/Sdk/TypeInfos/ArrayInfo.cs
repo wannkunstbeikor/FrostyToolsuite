@@ -9,5 +9,8 @@ internal class ArrayInfo : TypeInfo
     {
     }
 
-    public TypeInfo GetTypeInfo() => (m_data as ArrayInfoData)!.GetTypeInfo();
+    public TypeInfo GetTypeInfo()
+    {
+        return (m_data as ArrayInfoData)!.GetTypeInfo();
+    }
 }

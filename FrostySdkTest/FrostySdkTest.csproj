@@ -9,16 +9,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FrostySdk\FrostySdk.csproj" />
+    <ProjectReference Include="..\FrostySdk\FrostySdk.csproj"/>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.3" />
-    <PackageReference Include="NUnit" Version="3.13.3" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.3"/>
+    <PackageReference Include="NUnit" Version="3.13.3"/>
   </ItemGroup>
 
   <ItemGroup>
-    <EditorConfigFiles Include=".editorconfig" />
+    <EditorConfigFiles Include=".editorconfig"/>
   </ItemGroup>
 
 </Project>

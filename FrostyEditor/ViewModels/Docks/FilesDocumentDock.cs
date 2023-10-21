@@ -5,10 +5,6 @@ namespace FrostyEditor.ViewModels.Docks;
 
 public class FilesDocumentDock : DocumentDock
 {
-    public FilesDocumentDock()
-    {
-    }
-
     private void CreateNewDocument()
     {
         if (!CanCreateDocument)
@@ -16,10 +12,7 @@ public class FilesDocumentDock : DocumentDock
             return;
         }
 
-        FileViewModel document = new()
-        {
-            Title = "Untitled"
-        };
+        FileViewModel document = new() { Title = "Untitled" };
 
         Factory?.AddDockable(this, document);
         Factory?.SetActiveDockable(document);

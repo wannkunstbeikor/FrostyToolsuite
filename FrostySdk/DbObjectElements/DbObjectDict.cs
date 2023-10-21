@@ -14,19 +14,22 @@ public class DbObjectDict : DbObject
         m_items = new Dictionary<string, DbObject>();
     }
 
-    protected internal  DbObjectDict(int inCapacity)
+    protected internal DbObjectDict(int inCapacity)
         : base(Type.Dict | Type.Anonymous)
     {
         m_items = new Dictionary<string, DbObject>(inCapacity);
     }
-    
+
     protected internal DbObjectDict(string inName, int inCapacity)
         : base(Type.Dict, inName)
     {
         m_items = new Dictionary<string, DbObject>(inCapacity);
     }
 
-    public override bool IsDict() => true;
+    public override bool IsDict()
+    {
+        return true;
+    }
 
     public override DbObjectDict AsDict()
     {
@@ -40,7 +43,7 @@ public class DbObjectDict : DbObject
 
     public DbObjectDict? AsDict(string name, DbObjectDict? defaultValue)
     {
-        return m_items.TryGetValue(name, out DbObject? item) ? item.AsDict() : defaultValue;
+        return m_items.TryGetValue(name, out var item) ? item.AsDict() : defaultValue;
     }
 
     public DbObjectList AsList(string name)
@@ -50,65 +53,68 @@ public class DbObjectDict : DbObject
 
     public DbObjectList? AsList(string name, DbObjectList? defaultValue)
     {
-        return m_items.TryGetValue(name, out DbObject? item) ? item.AsList() : defaultValue;
+        return m_items.TryGetValue(name, out var item) ? item.AsList() : defaultValue;
     }
-    
+
     public bool AsBoolean(string name, bool defaultValue = default)
     {
-        return m_items.TryGetValue(name, out DbObject? item) ? item.AsBoolean() : defaultValue;
+        return m_items.TryGetValue(name, out var item) ? item.AsBoolean() : defaultValue;
     }
 
     public string AsString(string name, string defaultValue = "")
     {
-        return m_items.TryGetValue(name, out DbObject? item) ? item.AsString() : defaultValue;
+        return m_items.TryGetValue(name, out var item) ? item.AsString() : defaultValue;
     }
 
     public int AsInt(string name, int defaultValue = default)
     {
-        return m_items.TryGetValue(name, out DbObject? item) ? item.AsInt() : defaultValue;
+        return m_items.TryGetValue(name, out var item) ? item.AsInt() : defaultValue;
     }
 
     public uint AsUInt(string name, uint defaultValue = default)
     {
-        return m_items.TryGetValue(name, out DbObject? item) ? item.AsUInt() : defaultValue;
+        return m_items.TryGetValue(name, out var item) ? item.AsUInt() : defaultValue;
     }
 
     public long AsLong(string name, long defaultValue = default)
     {
-        return m_items.TryGetValue(name, out DbObject? item) ? item.AsLong() : defaultValue;
+        return m_items.TryGetValue(name, out var item) ? item.AsLong() : defaultValue;
     }
 
     public ulong AsULong(string name, ulong defaultValue = default)
     {
-        return m_items.TryGetValue(name, out DbObject? item) ? item.AsULong() : defaultValue;
+        return m_items.TryGetValue(name, out var item) ? item.AsULong() : defaultValue;
     }
 
     public float AsFloat(string name, float defaultValue = default)
     {
-        return m_items.TryGetValue(name, out DbObject? item) ? item.AsFloat() : defaultValue;
+        return m_items.TryGetValue(name, out var item) ? item.AsFloat() : defaultValue;
     }
 
     public double AsDouble(string name, double defaultValue = default)
     {
-        return m_items.TryGetValue(name, out DbObject? item) ? item.AsDouble() : defaultValue;
+        return m_items.TryGetValue(name, out var item) ? item.AsDouble() : defaultValue;
     }
 
     public Guid AsGuid(string name, Guid defaultValue = default)
     {
-        return m_items.TryGetValue(name, out DbObject? item) ? item.AsGuid() : defaultValue;
+        return m_items.TryGetValue(name, out var item) ? item.AsGuid() : defaultValue;
     }
 
     public Sha1 AsSha1(string name, Sha1 defaultValue = default)
     {
-        return m_items.TryGetValue(name, out DbObject? item) ? item.AsSha1() : defaultValue;
+        return m_items.TryGetValue(name, out var item) ? item.AsSha1() : defaultValue;
     }
 
     public byte[] AsBlob(string name, byte[]? defaultValue = default)
     {
-        return m_items.TryGetValue(name, out DbObject? item) ? item.AsBlob() : defaultValue ?? Array.Empty<byte>();
+        return m_items.TryGetValue(name, out var item) ? item.AsBlob() : defaultValue ?? Array.Empty<byte>();
     }
 
-    public bool ContainsKey(string name) => m_items.ContainsKey(name);
+    public bool ContainsKey(string name)
+    {
+        return m_items.ContainsKey(name);
+    }
 
     public void Add(string name, DbObjectDict value)
     {
@@ -119,7 +125,7 @@ public class DbObjectDict : DbObject
     {
         m_items.Add(name, value);
     }
-    
+
     public void Add(string name, bool value)
     {
         m_items.Add(name, new DbObjectBool(name, value));
@@ -174,20 +180,20 @@ public class DbObjectDict : DbObject
     {
         m_items.Add(name, new DbObjectBlob(name, value));
     }
-    
+
     protected override void InternalSerialize(DataStream stream)
     {
-        long curPos = stream.Position;
+        var curPos = stream.Position;
 
-        foreach (DbObject value in m_items.Values)
+        foreach (var value in m_items.Values)
         {
             Serialize(stream, value);
         }
-        
+
         // write terminator
         stream.WriteByte((byte)Type.Null);
 
-        long size = stream.Position - curPos;
+        var size = stream.Position - curPos;
         stream.Position = curPos;
         stream.Write7BitEncodedInt64(size);
         stream.Position = curPos + size;
@@ -198,13 +204,13 @@ public class DbObjectDict : DbObject
         stream.Read7BitEncodedInt64();
         while (true)
         {
-            DbObject? obj = Deserialize(stream);
+            var obj = Deserialize(stream);
 
             if (obj is null)
             {
                 break;
             }
-            
+
             m_items.Add(obj.Name, obj);
         }
     }

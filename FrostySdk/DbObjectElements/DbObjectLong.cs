@@ -16,7 +16,7 @@ public class DbObjectLong : DbObject
     {
         m_value = inValue;
     }
-    
+
     public DbObjectLong(string inName, long inValue)
         : base(Type.Long, inName)
     {

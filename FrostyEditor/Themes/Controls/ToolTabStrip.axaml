@@ -28,7 +28,7 @@
                   Padding="{TemplateBinding Padding}"
                   DockPanel.Dock="Left">
             <ItemsPresenter Name="PART_ItemsPresenter"
-                            ItemsPanel="{TemplateBinding ItemsPanel}"/>
+                            ItemsPanel="{TemplateBinding ItemsPanel}" />
           </Border>
           <Border Name="PART_BorderFill" />
         </DockPanel>

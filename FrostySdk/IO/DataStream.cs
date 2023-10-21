@@ -8,17 +8,10 @@ namespace Frosty.Sdk.IO;
 
 public unsafe class DataStream : IDisposable
 {
-    public long Position
-    {
-        get => m_stream.Position;
-        set => m_stream.Position = value;
-    }
-
-    public long Length => m_stream.Length;
-    
-    protected Stream m_stream;
     private readonly byte[] m_buffer;
     private readonly StringBuilder m_stringBuilder;
+
+    protected Stream m_stream;
 
     protected DataStream()
     {
@@ -26,38 +19,106 @@ public unsafe class DataStream : IDisposable
         m_buffer = new byte[20];
         m_stringBuilder = new StringBuilder();
     }
-    
+
     public DataStream(Stream inStream)
     {
         m_stream = inStream;
         m_buffer = new byte[20];
         m_stringBuilder = new StringBuilder();
     }
-    
-    public long Seek(long offset, SeekOrigin origin) => m_stream.Seek(offset, origin);
 
-    public void CopyTo(Stream destination) => m_stream.CopyTo(destination);
-    public void CopyTo(Stream destination, int length) => m_stream.CopyTo(destination, length);
+    public long Position
+    {
+        get => m_stream.Position;
+        set => m_stream.Position = value;
+    }
 
-    public void SetLength(int value) => m_stream.SetLength(value);
+    public long Length => m_stream.Length;
+
+    public virtual void Dispose()
+    {
+        m_stream.Dispose();
+    }
+
+    public long Seek(long offset, SeekOrigin origin)
+    {
+        return m_stream.Seek(offset, origin);
+    }
+
+    public void CopyTo(Stream destination)
+    {
+        m_stream.CopyTo(destination);
+    }
+
+    public void CopyTo(Stream destination, int length)
+    {
+        m_stream.CopyTo(destination, length);
+    }
+
+    public void SetLength(int value)
+    {
+        m_stream.SetLength(value);
+    }
+
+    public void Pad(int alignment)
+    {
+        if (m_stream.Position % alignment != 0)
+        {
+            m_stream.Position += alignment - (m_stream.Position % alignment);
+        }
+    }
+
+    public static implicit operator Stream(DataStream stream)
+    {
+        return stream.m_stream;
+    }
+
+    private short Reverse(short s)
+    {
+        var val = (ushort)s;
+        return (short)(((val & 0xff) << 8) | ((val & 0xff00) >> 8));
+    }
+
+    private int Reverse(int i)
+    {
+        var val = (uint)i;
+        return (int)(((val & 0xff) << 24) | ((val & 0xff000000) >> 24) |
+                     ((val & 0xff00) << 8) | ((val & 0xff0000) >> 8));
+    }
+
+    private long Reverse(long l)
+    {
+        ulong val = (uint)l;
+        return (long)(((val & 0x00000000000000ffUL) << 56) | ((val & 0xff00000000000000UL) >> 56) |
+                      ((val & 0x000000000000ff00UL) << 40) | ((val & 0x00ff000000000000UL) >> 40) |
+                      ((val & 0x0000000000ff0000UL) << 24) | ((val & 0x0000ff0000000000UL) >> 24) |
+                      ((val & 0x00000000ff000000UL) << 8) | ((val & 0x000000ff00000000UL) >> 8));
+    }
 
     #region -- Read --
 
     public byte[] ReadBytes(int count)
     {
-        byte[] retVal = new byte[count];
+        var retVal = new byte[count];
         m_stream.ReadExactly(retVal, 0, retVal.Length);
         return retVal;
     }
-    public void ReadExactly(Span<byte> buffer) => m_stream.ReadExactly(buffer);
-    
-    public int Read(byte[] buffer, int offset, int count) => m_stream.Read(buffer, offset, count);
-    
+
+    public void ReadExactly(Span<byte> buffer)
+    {
+        m_stream.ReadExactly(buffer);
+    }
+
+    public int Read(byte[] buffer, int offset, int count)
+    {
+        return m_stream.Read(buffer, offset, count);
+    }
+
     #region -- Basic Types --
 
     public byte ReadByte()
     {
-        int retVal = m_stream.ReadByte();
+        var retVal = m_stream.ReadByte();
         if (retVal == -1)
         {
             throw new EndOfStreamException();
@@ -65,7 +126,7 @@ public unsafe class DataStream : IDisposable
 
         return (byte)retVal;
     }
-    
+
     public sbyte ReadSByte()
     {
         return (sbyte)ReadByte();
@@ -84,11 +145,12 @@ public unsafe class DataStream : IDisposable
     public short ReadInt16(Endian endian = Endian.Little)
     {
         m_stream.ReadExactly(m_buffer, 0, sizeof(short));
-        
+
         if (endian == Endian.Big)
         {
             Array.Reverse(m_buffer, 0, sizeof(short));
         }
+
         return BitConverter.ToInt16(m_buffer);
     }
 
@@ -96,12 +158,12 @@ public unsafe class DataStream : IDisposable
     {
         return (ushort)ReadInt16(endian);
     }
-    
+
     public int ReadInt32(Endian endian = Endian.Little)
     {
-        Span<byte> span = m_buffer.AsSpan(0, sizeof(int));
+        var span = m_buffer.AsSpan(0, sizeof(int));
         m_stream.ReadExactly(span);
-        
+
         if (endian == Endian.Big)
         {
             return BinaryPrimitives.ReadInt32BigEndian(span);
@@ -109,17 +171,17 @@ public unsafe class DataStream : IDisposable
 
         return BinaryPrimitives.ReadInt32LittleEndian(span);
     }
-    
+
     public uint ReadUInt32(Endian endian = Endian.Little)
     {
         return (uint)ReadInt32(endian);
     }
-    
+
     public long ReadInt64(Endian endian = Endian.Little)
     {
-        Span<byte> span = m_buffer.AsSpan(0, sizeof(long));
+        var span = m_buffer.AsSpan(0, sizeof(long));
         m_stream.ReadExactly(span);
-        
+
         if (endian == Endian.Big)
         {
             return BinaryPrimitives.ReadInt64BigEndian(span);
@@ -132,12 +194,12 @@ public unsafe class DataStream : IDisposable
     {
         return (ulong)ReadInt64(endian);
     }
-    
+
     public float ReadSingle(Endian endian = Endian.Little)
     {
-        Span<byte> span = m_buffer.AsSpan(0, sizeof(float));
+        var span = m_buffer.AsSpan(0, sizeof(float));
         m_stream.ReadExactly(span);
-        
+
         if (endian == Endian.Big)
         {
             return BinaryPrimitives.ReadSingleBigEndian(span);
@@ -145,12 +207,12 @@ public unsafe class DataStream : IDisposable
 
         return BinaryPrimitives.ReadSingleLittleEndian(span);
     }
-    
+
     public double ReadDouble(Endian endian = Endian.Little)
     {
-        Span<byte> span = m_buffer.AsSpan(0, sizeof(double));
+        var span = m_buffer.AsSpan(0, sizeof(double));
         m_stream.ReadExactly(span);
-        
+
         if (endian == Endian.Big)
         {
             return BinaryPrimitives.ReadDoubleBigEndian(span);
@@ -162,13 +224,13 @@ public unsafe class DataStream : IDisposable
     #endregion
 
     #region -- Strings --
-    
+
     public string ReadNullTerminatedString(bool wide = false)
     {
         m_stringBuilder.Clear();
         while (true)
         {
-            char c = ReadChar(wide);
+            var c = ReadChar(wide);
             if (c == 0)
             {
                 return m_stringBuilder.ToString();
@@ -196,48 +258,50 @@ public unsafe class DataStream : IDisposable
     public int Read7BitEncodedInt32()
     {
         uint num1 = 0;
-        for (int index = 0; index < 28; index += 7)
+        for (var index = 0; index < 28; index += 7)
         {
-            byte num2 = ReadByte();
-            num1 |= (uint) ((num2 & sbyte.MaxValue) << index);
+            var num2 = ReadByte();
+            num1 |= (uint)((num2 & sbyte.MaxValue) << index);
             if (num2 <= 127)
             {
-                return (int) num1;
+                return (int)num1;
             }
         }
-        byte num3 = ReadByte();
+
+        var num3 = ReadByte();
         if (num3 > 15)
         {
             throw new FormatException();
         }
 
-        return (int) (num1 | (uint) num3 << 28);
+        return (int)(num1 | ((uint)num3 << 28));
     }
 
     public long Read7BitEncodedInt64()
     {
         ulong num1 = 0;
-        for (int index = 0; index < 63; index += 7)
+        for (var index = 0; index < 63; index += 7)
         {
-            byte num2 = ReadByte();
-            num1 |= (ulong) (((long) num2 & sbyte.MaxValue) << index);
+            var num2 = ReadByte();
+            num1 |= (ulong)(((long)num2 & sbyte.MaxValue) << index);
             if (num2 <= 127)
             {
-                return (long) num1;
+                return (long)num1;
             }
         }
-        byte num3 = ReadByte();
+
+        var num3 = ReadByte();
         if (num3 > 1)
         {
             throw new FormatException();
         }
 
-        return (long) (num1 | (ulong) num3 << 63);
+        return (long)(num1 | ((ulong)num3 << 63));
     }
 
     public Guid ReadGuid(Endian endian = Endian.Little)
     {
-        Span<byte> span = m_buffer.AsSpan(0, sizeof(Guid));
+        var span = m_buffer.AsSpan(0, sizeof(Guid));
         m_stream.ReadExactly(span);
 
         if (endian == Endian.Big)
@@ -252,19 +316,25 @@ public unsafe class DataStream : IDisposable
 
     public Sha1 ReadSha1()
     {
-        Span<byte> span = m_buffer.AsSpan(0, sizeof(Sha1));
+        var span = m_buffer.AsSpan(0, sizeof(Sha1));
         m_stream.ReadExactly(span);
-        
+
         return new Sha1(span);
     }
 
     #endregion
-    
+
     #region -- Write --
 
-    public void Write(ReadOnlySpan<byte> buffer) => m_stream.Write(buffer);
+    public void Write(ReadOnlySpan<byte> buffer)
+    {
+        m_stream.Write(buffer);
+    }
 
-    public void Write(byte[] buffer, int offset, int count) => m_stream.Write(buffer, offset, count);
+    public void Write(byte[] buffer, int offset, int count)
+    {
+        m_stream.Write(buffer, offset, count);
+    }
 
     #region -- Basic Types --
 
@@ -296,6 +366,7 @@ public unsafe class DataStream : IDisposable
         {
             value = Reverse(value);
         }
+
         Unsafe.As<byte, short>(ref m_buffer[0]) = value;
         m_stream.Write(m_buffer, 0, sizeof(short));
     }
@@ -304,28 +375,30 @@ public unsafe class DataStream : IDisposable
     {
         WriteInt16((short)value, endian);
     }
-    
+
     public void WriteInt32(int value, Endian endian = Endian.Little)
     {
         if (endian == Endian.Big)
         {
             value = Reverse(value);
         }
+
         Unsafe.As<byte, int>(ref m_buffer[0]) = value;
         m_stream.Write(m_buffer, 0, sizeof(int));
     }
-    
+
     public void WriteUInt32(uint value, Endian endian = Endian.Little)
     {
         WriteInt32((int)value, endian);
     }
-    
+
     public void WriteInt64(long value, Endian endian = Endian.Little)
     {
         if (endian == Endian.Big)
         {
             value = Reverse(value);
         }
+
         Unsafe.As<byte, long>(ref m_buffer[0]) = value;
         m_stream.Write(m_buffer, 0, sizeof(long));
     }
@@ -339,15 +412,16 @@ public unsafe class DataStream : IDisposable
     {
         if (endian == Endian.Big)
         {
-            int i = 0;
+            var i = 0;
             Unsafe.As<int, float>(ref i) = value;
             i = Reverse(i);
             Unsafe.As<byte, int>(ref m_buffer[0]) = i;
         }
         else
         {
-            Unsafe.As<byte, float>(ref m_buffer[0]) = value;   
+            Unsafe.As<byte, float>(ref m_buffer[0]) = value;
         }
+
         m_stream.Write(m_buffer, 0, sizeof(float));
     }
 
@@ -362,8 +436,9 @@ public unsafe class DataStream : IDisposable
         }
         else
         {
-            Unsafe.As<byte, double>(ref m_buffer[0]) = value;   
+            Unsafe.As<byte, double>(ref m_buffer[0]) = value;
         }
+
         m_stream.Write(m_buffer, 0, sizeof(double));
     }
 
@@ -382,6 +457,7 @@ public unsafe class DataStream : IDisposable
         {
             Encoding.ASCII.GetBytes(value, span);
         }
+
         m_stream.Write(span);
     }
 
@@ -391,10 +467,10 @@ public unsafe class DataStream : IDisposable
         Encoding.UTF8.GetBytes(value, span);
         m_stream.Write(span);
     }
-    
+
     public void WriteSizedString(string value)
     {
-        int size = Encoding.UTF8.GetByteCount(value) + 1;
+        var size = Encoding.UTF8.GetByteCount(value) + 1;
         Write7BitEncodedInt32(size);
         WriteFixedSizedString(value, size);
     }
@@ -404,83 +480,48 @@ public unsafe class DataStream : IDisposable
     public void WriteGuid(Guid value, Endian endian = Endian.Little)
     {
         Unsafe.As<byte, Guid>(ref m_buffer[0]) = value;
-        
+
         if (endian == Endian.Big)
         {
             Array.Reverse(m_buffer, 0, sizeof(Guid));
         }
+
         m_stream.Write(m_buffer, 0, sizeof(Guid));
     }
 
     public void WriteSha1(Sha1 value, Endian endian = Endian.Little)
     {
         Unsafe.As<byte, Sha1>(ref m_buffer[0]) = value;
-        
+
         if (endian == Endian.Big)
         {
             Array.Reverse(m_buffer, 0, sizeof(Sha1));
         }
+
         m_stream.Write(m_buffer, 0, sizeof(Sha1));
     }
-    
+
     public void Write7BitEncodedInt32(int value)
     {
         uint num;
-        for (num = (uint) value; num > (uint) sbyte.MaxValue; num >>= 7)
+        for (num = (uint)value; num > (uint)sbyte.MaxValue; num >>= 7)
         {
-            WriteByte((byte) (num | 0xFFFFFF80U));
+            WriteByte((byte)(num | 0xFFFFFF80U));
         }
 
-        WriteByte((byte) num);
+        WriteByte((byte)num);
     }
 
     public void Write7BitEncodedInt64(long value)
     {
         ulong num;
-        for (num = (ulong) value; num > (ulong) sbyte.MaxValue; num >>= 7)
+        for (num = (ulong)value; num > (ulong)sbyte.MaxValue; num >>= 7)
         {
-            WriteByte((byte) ((uint) num | 0xFFFFFF80U));
+            WriteByte((byte)((uint)num | 0xFFFFFF80U));
         }
 
-        WriteByte((byte) num);
+        WriteByte((byte)num);
     }
 
     #endregion
-
-    public void Pad(int alignment)
-    {
-        if (m_stream.Position % alignment != 0)
-        {
-            m_stream.Position += alignment - (m_stream.Position % alignment);
-        } 
-    }
-    
-    public static implicit operator Stream(DataStream stream) => stream.m_stream;
-    
-    public virtual void Dispose()
-    {
-        m_stream.Dispose();
-    }
-
-    private short Reverse(short s)
-    {
-        ushort val = (ushort)s;
-        return (short)(((val & 0xff) << 8) | ((val & 0xff00) >> 8));
-    }
-    
-    private int Reverse(int i)
-    {
-        uint val = (uint)i;
-        return (int)(((val & 0xff) << 24) | ((val & 0xff000000) >> 24) |
-                     ((val & 0xff00) << 8) | ((val & 0xff0000) >> 8));
-    }
-
-    private long Reverse(long l)
-    {
-        ulong val = (uint)l;
-        return (long)(((val & 0x00000000000000ffUL) << 56) | ((val & 0xff00000000000000UL) >> 56) |
-                      ((val & 0x000000000000ff00UL) << 40) | ((val & 0x00ff000000000000UL) >> 40) |
-                      ((val & 0x0000000000ff0000UL) << 24) | ((val & 0x0000ff0000000000UL) >> 24) |
-                      ((val & 0x00000000ff000000UL) <<  8) | ((val & 0x000000ff00000000UL) >> 8));
-    }
 }

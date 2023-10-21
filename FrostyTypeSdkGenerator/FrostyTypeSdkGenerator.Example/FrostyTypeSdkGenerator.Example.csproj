@@ -6,19 +6,19 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>disable</ImplicitUsings>
     </PropertyGroup>
-    
+
     <PropertyGroup>
         <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\FrostySdk\FrostySdk.csproj" />
-        <ProjectReference Include="..\FrostyTypeSdkGenerator\FrostyTypeSdkGenerator.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" OutputItemType="Analyzer" SetTargetFramework="TargetFramework=netstandard2.0" />
+        <ProjectReference Include="..\..\FrostySdk\FrostySdk.csproj"/>
+        <ProjectReference Include="..\FrostyTypeSdkGenerator\FrostyTypeSdkGenerator.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" OutputItemType="Analyzer" SetTargetFramework="TargetFramework=netstandard2.0"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Remove="Meta\Asset.cs" />
-      <AdditionalFiles Include="Meta\Asset.cs" />
+        <Compile Remove="Meta\Asset.cs"/>
+        <AdditionalFiles Include="Meta\Asset.cs"/>
     </ItemGroup>
 
 </Project>
