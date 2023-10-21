@@ -16,7 +16,7 @@ public class DbObjectSha1 : DbObject
     {
         m_value = inValue;
     }
-
+    
     public DbObjectSha1(string inName, Sha1 inValue)
         : base(Type.Sha1, inName)
     {

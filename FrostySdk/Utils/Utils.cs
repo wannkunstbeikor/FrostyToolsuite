@@ -13,16 +13,16 @@ public static class Utils
     {
         const uint kOffset = 5381;
         const uint kPrime = 33;
-
-        var hash = kOffset;
-        for (var i = 0; i < value.Length; i++)
+        
+        uint hash = kOffset;
+        for (int i = 0; i < value.Length; i++)
         {
             hash = (hash * kPrime) ^ (byte)(toLower ? char.ToLower(value[i]) : value[i]);
         }
 
         return (int)hash;
     }
-
+    
     public static Guid GenerateDeterministicGuid(IEnumerable<object> objects, string type, Guid fileGuid)
     {
         return GenerateDeterministicGuid(objects, TypeLibrary.GetType(type)!, fileGuid);
@@ -32,7 +32,7 @@ public static class Utils
     {
         Guid outGuid;
 
-        var createCount = 0;
+        int createCount = 0;
         HashSet<Guid> existingGuids = new();
         foreach (dynamic obj in objects)
         {
@@ -40,7 +40,7 @@ public static class Utils
             existingGuids.Add(objGuid.ExportedGuid);
             createCount++;
         }
-
+        
         Block<byte> buffer = new(stackalloc byte[20]);
 
         Span<byte> result = stackalloc byte[16];
@@ -61,7 +61,7 @@ public static class Utils
                 break;
             }
         }
-
+        
         buffer.Dispose();
 
         return outGuid;
@@ -90,8 +90,9 @@ public static class Utils
         {
             random.NextBytes(buf);
             ulongRand = BinaryPrimitives.ReadUInt64LittleEndian(buf);
-        } while (ulongRand > max - (((max % uRange) + 1) % uRange));
 
-        return ((ulongRand % uRange) + min) | 1;
+        } while (ulongRand > max - (max % uRange + 1) % uRange);
+
+        return (ulongRand % uRange + min) | 1;
     }
 }

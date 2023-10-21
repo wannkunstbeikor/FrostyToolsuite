@@ -16,7 +16,7 @@ public class DbObjectFloat : DbObject
     {
         m_value = inValue;
     }
-
+    
     public DbObjectFloat(string inName, float inValue)
         : base(Type.Float, inName)
     {

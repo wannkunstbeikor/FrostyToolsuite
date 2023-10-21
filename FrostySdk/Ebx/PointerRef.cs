@@ -20,7 +20,7 @@ public struct PointerRef
     {
         External = new EbxImportReference { FileGuid = guid, ClassGuid = Guid.Empty };
         Internal = null;
-        Type = guid != Guid.Empty ? PointerRefType.External : PointerRefType.Null;
+        Type = (guid != Guid.Empty) ? PointerRefType.External : PointerRefType.Null;
     }
 
     public PointerRef(object internalRef)
@@ -30,18 +30,12 @@ public struct PointerRef
         Type = PointerRefType.Internal;
     }
 
-    public static bool operator ==(PointerRef a, object b)
-    {
-        return a.Equals(b);
-    }
+    public static bool operator ==(PointerRef a, object b) => a.Equals(b);
 
-    public static bool operator !=(PointerRef a, object b)
-    {
-        return !a.Equals(b);
-    }
+    public static bool operator !=(PointerRef a, object b) => !a.Equals(b);
 
     public override bool Equals(object? obj)
-    {
+    {  
         if (obj is not PointerRef b)
         {
             return false;
@@ -59,7 +53,7 @@ public struct PointerRef
     {
         unchecked
         {
-            var hash = (int)2166136261;
+            int hash = (int)2166136261;
             hash = (hash * 16777619) ^ Type.GetHashCode();
             if (Type == PointerRefType.Internal)
             {

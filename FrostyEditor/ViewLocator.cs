@@ -10,16 +10,16 @@ public class ViewLocator : IDataTemplate
 {
     public Control Build(object? data)
     {
-        var name = data?.GetType().FullName?.Replace("ViewModel", "View");
+        string? name = data?.GetType().FullName?.Replace("ViewModel", "View");
         if (name is null)
         {
             return new TextBlock { Text = "Invalid Data Type" };
         }
-
-        var type = Type.GetType(name);
+        
+        Type? type = Type.GetType(name);
         if (type is not null)
         {
-            var instance = Activator.CreateInstance(type);
+            object? instance = Activator.CreateInstance(type);
             if (instance is not null)
             {
                 return (Control)instance;

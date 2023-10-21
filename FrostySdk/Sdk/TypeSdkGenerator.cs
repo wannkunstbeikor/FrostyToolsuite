@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 using Frosty.Sdk.IO;
 using Frosty.Sdk.Managers;
 using FrostyTypeSdkGenerator;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Emit;
 
 namespace Frosty.Sdk.Sdk;
 
@@ -24,39 +27,38 @@ public class TypeSdkGenerator
         //     "488b05???????? 488905???????? 488d05???????? 488905???????? E9",
         //     "48391D???????? ???? 488b4310", // new games
         // };
-
-        var startAddress = process.MainModule?.BaseAddress.ToInt64() ?? 0;
-
+        
+        long startAddress = process.MainModule?.BaseAddress.ToInt64() ?? 0;
+        
         using (MemoryReader reader = new(process, startAddress))
         {
             reader.Position = startAddress;
-            var offsets = reader.Scan(ProfilesLibrary.TypeInfoSignature);
+            IList<long> offsets = reader.Scan(ProfilesLibrary.TypeInfoSignature);
 
             if (offsets.Count == 0)
             {
                 return -1;
             }
-
+            
             reader.Position = offsets![0] + 3;
-            var newValue = reader.ReadInt(false);
+            int newValue = reader.ReadInt(false);
             reader.Position = offsets[0] + 3 + newValue + 4;
             return reader.ReadLong(false);
         }
     }
-
+    
     public bool DumpTypes(Process process)
     {
-        var typeInfoOffset = FindTypeInfoOffset(process);
+        long typeInfoOffset = FindTypeInfoOffset(process);
         if (typeInfoOffset == -1)
         {
             return false;
         }
-
         using (MemoryReader reader = new(process, typeInfoOffset))
         {
             TypeInfo.TypeInfoMapping.Clear();
 
-            var ti = TypeInfo.ReadTypeInfo(reader);
+            TypeInfo? ti = TypeInfo.ReadTypeInfo(reader);
 
             do
             {
@@ -70,7 +72,7 @@ public class TypeSdkGenerator
     public bool CreateSdk(string filePath)
     {
         StringBuilder sb = new();
-
+        
         sb.AppendLine("using System;");
         sb.AppendLine("using System.Collections.Generic;");
         sb.AppendLine("using Frosty.Sdk.Attributes;");
@@ -82,8 +84,8 @@ public class TypeSdkGenerator
         sb.AppendLine();
         sb.AppendLine("namespace Frosty.Sdk.Ebx;");
 
-
-        foreach (var typeInfo in TypeInfo.TypeInfoMapping.Values)
+        
+        foreach (TypeInfo typeInfo in TypeInfo.TypeInfoMapping.Values)
         {
             switch (typeInfo.GetFlags().GetTypeEnum())
             {
@@ -119,15 +121,15 @@ public class TypeSdkGenerator
             }
         }
 
-        var source = sb.ToString();
+        string source = sb.ToString();
 
-        var syntaxTree = CSharpSyntaxTree.ParseText(source);
+        SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(source);
 
         List<MetadataReference> references = new();
+        
+        Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
 
-        var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-
-        foreach (var assembly in assemblies)
+        foreach (Assembly assembly in assemblies)
         {
             if (!assembly.IsDynamic && !string.IsNullOrEmpty(assembly.Location))
             {
@@ -135,34 +137,33 @@ public class TypeSdkGenerator
             }
         }
 
-
+        
 #if EBX_TYPE_SDK_DEBUG
         OptimizationLevel level = OptimizationLevel.Debug;
 #else
-        var level = OptimizationLevel.Release;
+        OptimizationLevel level = OptimizationLevel.Release;
 #endif
-
-        var compilation = CSharpCompilation.Create("EbxTypes", new[] { syntaxTree }, references,
-            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, allowUnsafe: true,
-                optimizationLevel: level));
-
-        var meta = new List<AdditionalText>();
-
+        
+        CSharpCompilation compilation = CSharpCompilation.Create("EbxTypes", new[] { syntaxTree }, references,
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, allowUnsafe: true, optimizationLevel: level));
+        
+        List<AdditionalText> meta = new List<AdditionalText>();
+        
         if (Directory.Exists("Meta"))
         {
-            foreach (var additionalTextPath in Directory.EnumerateFiles("Meta"))
+            foreach (string additionalTextPath in Directory.EnumerateFiles("Meta"))
             {
                 meta.Add(new CustomAdditionalText(additionalTextPath));
             }
         }
 
-        var driver = CSharpGeneratorDriver
+        GeneratorDriver driver = CSharpGeneratorDriver
             .Create(new SourceGenerator())
             .AddAdditionalTexts(ImmutableArray.CreateRange(meta));
-
+        
         driver.RunGeneratorsAndUpdateCompilation(
             compilation,
-            out var outputCompilation,
+            out Compilation outputCompilation,
             out _);
 
 #if EBX_TYPE_SDK_DEBUG
@@ -179,10 +180,10 @@ public class TypeSdkGenerator
             File.WriteAllText(tree.FilePath, tree.GetText().ToString());
         }
 #endif
-
+        
         using (FileStream stream = new(filePath, FileMode.Create, FileAccess.Write))
         {
-            var result = outputCompilation.Emit(stream);
+            EmitResult result = outputCompilation.Emit(stream);
             if (!result.Success)
             {
 #if EBX_TYPE_SDK_DEBUG
@@ -191,7 +192,7 @@ public class TypeSdkGenerator
                 return false;
             }
         }
-
+        
         return true;
     }
 }

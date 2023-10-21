@@ -2,7 +2,7 @@
   "Name": "MassEffectAndromeda",
   "DisplayName": "Mass Effect: Andromeda",
   "InternalName": "masseffect",
-  "TypeInfoSignature": "",
+  "TypeInfoSignature" : "",
   "HasStrippedTypeNames": false,
   "DataVersion": 20170320,
   "FrostbiteVersion": "2015.4.6",

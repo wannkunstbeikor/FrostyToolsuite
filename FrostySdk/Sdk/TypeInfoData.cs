@@ -9,21 +9,21 @@ namespace Frosty.Sdk.Sdk;
 
 internal class TypeInfoData
 {
-    protected byte m_alignment;
-    protected ushort m_fieldCount;
-    protected TypeFlags m_flags;
-    protected Guid m_guid;
     protected string m_name = string.Empty;
     protected uint m_nameHash;
-    protected string m_nameSpace = string.Empty;
-    protected uint m_signature;
+    protected TypeFlags m_flags;
     protected ushort m_size;
+    protected Guid m_guid;
+    protected string m_nameSpace = string.Empty;
     protected long p_arrayInfo;
+    protected byte m_alignment;
+    protected ushort m_fieldCount;
+    protected uint m_signature;
 
     public static TypeInfoData ReadTypeInfoData(MemoryReader reader)
     {
         TypeInfoData retVal;
-        var name = string.Empty;
+        string name = string.Empty;
         if (!ProfilesLibrary.HasStrippedTypeNames)
         {
             name = reader.ReadNullTerminatedString();
@@ -87,7 +87,7 @@ internal class TypeInfoData
 
         if (!ProfilesLibrary.HasStrippedTypeNames)
         {
-            if (Strings.ClassHashes.TryGetValue(nameHash, out var hash))
+            if (Strings.ClassHashes.TryGetValue(nameHash, out string? hash))
             {
                 name = hash;
             }
@@ -115,8 +115,8 @@ internal class TypeInfoData
             m_guid = reader.ReadGuid();
         }
 
-        var nameSpaceOffset = reader.ReadLong();
-        var curPos = reader.Position;
+        long nameSpaceOffset = reader.ReadLong();
+        long curPos = reader.Position;
         reader.Position = nameSpaceOffset;
         m_nameSpace = reader.ReadNullTerminatedString();
         reader.Position = curPos;
@@ -134,54 +134,39 @@ internal class TypeInfoData
         }
     }
 
-    public void SetGuid(Guid guid)
-    {
-        m_guid = guid;
-    }
+    public void SetGuid(Guid guid) => m_guid = guid;
 
-    public string GetName()
-    {
-        return m_name;
-    }
+    public string GetName() => m_name;
 
-    public TypeFlags GetFlags()
-    {
-        return m_flags;
-    }
+    public TypeFlags GetFlags() => m_flags;
 
     public virtual void CreateType(StringBuilder sb)
     {
-        sb.AppendLine(
-            $"[{nameof(EbxTypeMetaAttribute)}({(ushort)m_flags}, {m_alignment}, {m_size}, \"{m_nameSpace}\")]");
+        sb.AppendLine($"[{nameof(EbxTypeMetaAttribute)}({(ushort)m_flags}, {m_alignment}, {m_size}, \"{m_nameSpace}\")]");
 
         sb.AppendLine($"[{nameof(DisplayNameAttribute)}(\"{m_name}\")]");
-
+        
         if (!m_guid.Equals(Guid.Empty))
         {
             sb.AppendLine($"[{nameof(GuidAttribute)}(\"{m_guid}\")]");
         }
-
         if (m_nameHash != 0)
         {
             sb.AppendLine($"[{nameof(NameHashAttribute)}({m_nameHash})]");
         }
-
         if (m_signature != 0)
         {
             sb.AppendLine($"[{nameof(SignatureAttribute)}({m_signature})]");
         }
 
-        if (TypeInfo.TypeInfoMapping.TryGetValue(p_arrayInfo, out var value))
+        if (TypeInfo.TypeInfoMapping.TryGetValue(p_arrayInfo, out TypeInfo? value))
         {
-            var arrayInfo = (value as ArrayInfo)!;
+            ArrayInfo arrayInfo = (value as ArrayInfo)!;
             arrayInfo.CreateType(sb);
         }
     }
 
-    public string CleanUpName()
-    {
-        return CleanUpString(m_name);
-    }
+    public string CleanUpName() => CleanUpString(m_name);
 
     public string CleanUpString(string name)
     {
@@ -194,7 +179,6 @@ internal class TypeInfoData
         {
             return name[(name.IndexOf("::", StringComparison.Ordinal) + 2)..];
         }
-
         return name.Replace(':', '_').Replace("<", "_").Replace(">", "_");
     }
 }

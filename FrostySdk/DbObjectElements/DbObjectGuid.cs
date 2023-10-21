@@ -17,7 +17,7 @@ public class DbObjectGuid : DbObject
     {
         m_value = inValue;
     }
-
+    
     public DbObjectGuid(string inName, Guid inValue)
         : base(Type.Guid, inName)
     {

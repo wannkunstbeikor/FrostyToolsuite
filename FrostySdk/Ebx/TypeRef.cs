@@ -4,75 +4,61 @@ namespace Frosty.Sdk.Ebx;
 
 public class TypeRef
 {
+    public string Name => m_typeName;
+    public Guid Guid => m_typeGuid;
     private readonly Guid m_typeGuid;
+    private readonly string m_typeName;
 
     public TypeRef()
     {
-        Name = string.Empty;
+        m_typeName = string.Empty;
     }
 
     public TypeRef(string value)
     {
-        Name = value;
+        m_typeName = value;
     }
 
     public TypeRef(Guid guid)
     {
         m_typeGuid = guid;
-        Name = TypeLibrary.GetType(guid)?.Name ?? m_typeGuid.ToString();
+        m_typeName = TypeLibrary.GetType(guid)?.Name ?? m_typeGuid.ToString();
     }
-
-    public string Name { get; }
-
-    public Guid Guid => m_typeGuid;
 
     public Type GetReferencedType()
     {
         // should be a primitive type if the GUID is empty
         if (m_typeGuid == Guid.Empty)
         {
-            var refType = TypeLibrary.GetType(Name);
+            Type? refType = TypeLibrary.GetType(m_typeName);
             if (refType == null)
             {
-                throw new Exception($"Could not find the type {Name}");
+                throw new Exception($"Could not find the type {m_typeName}");
             }
-
             return refType;
         }
         else
         {
-            var refType = TypeLibrary.GetType(m_typeGuid);
+
+            Type? refType = TypeLibrary.GetType(m_typeGuid);
             if (refType == null)
             {
-                throw new Exception($"Could not find the type {Name}");
+                throw new Exception($"Could not find the type {m_typeName}");
             }
-
             return refType;
         }
     }
 
     public static implicit operator string(TypeRef value)
     {
-        return value.m_typeGuid != Guid.Empty ? value.m_typeGuid.ToString().ToUpper() : value.Name;
+        return value.m_typeGuid != Guid.Empty ? value.m_typeGuid.ToString().ToUpper() : value.m_typeName;
     }
 
-    public static implicit operator TypeRef(string value)
-    {
-        return new TypeRef(value);
-    }
+    public static implicit operator TypeRef(string value) => new(value);
 
-    public static implicit operator TypeRef(Guid guid)
-    {
-        return new TypeRef(guid);
-    }
+    public static implicit operator TypeRef(Guid guid) => new(guid);
 
-    public bool IsNull()
-    {
-        return string.IsNullOrEmpty(Name);
-    }
+    public bool IsNull() => string.IsNullOrEmpty(m_typeName);
 
-    public override string ToString()
-    {
-        return $"TypeRef '{(IsNull() ? "(null)" : Name)}'";
-    }
+    public override string ToString() => $"TypeRef '{(IsNull() ? "(null)" : m_typeName)}'";
 }

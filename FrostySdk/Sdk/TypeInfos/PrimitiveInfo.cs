@@ -8,4 +8,4 @@ internal class PrimitiveInfo : TypeInfo
         : base(data)
     {
     }
-}
+} 

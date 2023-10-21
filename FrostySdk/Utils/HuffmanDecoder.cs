@@ -1,18 +1,25 @@
+using Frosty.Sdk.IO;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Frosty.Sdk.IO;
 
 namespace Frosty.Sdk.Utils;
 
 /// <summary>
-///     A node in the huffman coding scheme
+/// A node in the huffman coding scheme
 /// </summary>
 internal class HuffmanNode : IComparable<HuffmanNode>
 {
+    public bool IsLeaf => Left == null && Right == null;
+    public char Letter => (char)(~Value);
+
     public uint Value;
+    public HuffmanNode? Left { get; private set; }
+    public HuffmanNode? Right { get; private set; }
+
+    public HuffmanNode? Parent { get; private set; }
 
     public HuffmanNode()
     {
@@ -30,18 +37,6 @@ internal class HuffmanNode : IComparable<HuffmanNode>
         Value = stream.ReadUInt32(endian);
     }
 
-    public bool IsLeaf => Left == null && Right == null;
-    public char Letter => (char)~Value;
-    public HuffmanNode? Left { get; private set; }
-    public HuffmanNode? Right { get; private set; }
-
-    public HuffmanNode? Parent { get; private set; }
-
-    public int CompareTo(HuffmanNode? other)
-    {
-        return Value.CompareTo(other?.Value);
-    }
-
     public void SetLeftNode(HuffmanNode leftNode)
     {
         Left = leftNode;
@@ -56,17 +51,17 @@ internal class HuffmanNode : IComparable<HuffmanNode>
 
     public override string ToString()
     {
-        var printLetter = Value switch
+        string printLetter = Value switch
         {
             uint.MaxValue => "endDelimiter",
             4294967285 => "newLine",
-            _ => Letter.ToString()
+            _ => Letter.ToString(),
         };
         return $"[Value = <{Value}> | Letter = <{printLetter}>]";
     }
 
     /// <summary>
-    ///     Returns the bit representation of this node, to be used in tests.
+    /// Returns the bit representation of this node, to be used in tests.
     /// </summary>
     /// <returns>The bit representation of this node.</returns>
     public string GetBitRepresentation()
@@ -89,24 +84,28 @@ internal class HuffmanNode : IComparable<HuffmanNode>
         {
             bitVal = "ERROR!";
         }
-
         return Parent.GetBitRepresentation() + bitVal;
+    }
+
+    public int CompareTo(HuffmanNode? other)
+    {
+        return Value.CompareTo(other?.Value);
     }
 }
 
 public class HuffmanDecoder
 {
-    private int[]? m_data;
-
     /// <summary>
-    ///     Root Node of the Huffman Table.
+    /// Root Node of the Huffman Table.
     /// </summary>
     private HuffmanNode? m_rootNode;
 
+    private int[]? m_data;
+
     /// <summary>
-    ///     Parses a Huffman Table.
+    /// Parses a Huffman Table.
     /// </summary>
-    /// <param name="stream">The <see cref="DataStream" /> the Huffman Table gets read from.</param>
+    /// <param name="stream">The <see cref="DataStream"/> the Huffman Table gets read from.</param>
     /// <param name="count">The number of Huffman Nodes the Table contains.</param>
     /// <param name="endian">The Endianess in which the Huffman Table gets read.</param>
     public void ReadHuffmanTable(DataStream stream, uint count, Endian endian = Endian.Little)
@@ -118,10 +117,10 @@ public class HuffmanDecoder
         List<HuffmanNode> nodes = new();
         uint nodeValue = 0;
 
-        for (var i = 0; i < count; i++)
+        for (int i = 0; i < count; i++)
         {
             HuffmanNode n = new(stream, endian);
-            var idx = nodes.FindIndex(a => a.Value == n.Value);
+            int idx = nodes.FindIndex(a => a.Value == n.Value);
             if (idx != -1)
             {
                 n = nodes[idx];
@@ -155,55 +154,55 @@ public class HuffmanDecoder
     }
 
     /// <summary>
-    ///     Reads in the encoded data.
+    /// Reads in the encoded data.
     /// </summary>
-    /// <param name="stream">The <see cref="DataStream" /> the encoded data gets read from.</param>
-    /// <param name="integerCount">The number of <see cref="int" />s the data contains.</param>
-    /// <param name="endian">The <see cref="Endian" /> in which the encoded data gets read.</param>
+    /// <param name="stream">The <see cref="DataStream"/> the encoded data gets read from.</param>
+    /// <param name="integerCount">The number of <see cref="int"/>s the data contains.</param>
+    /// <param name="endian">The <see cref="Endian"/> in which the encoded data gets read.</param>
     public void ReadEncodedData(DataStream stream, uint integerCount, Endian endian = Endian.Little)
     {
         m_data = new int[integerCount];
 
-        for (var i = 0; i < integerCount; i++)
+        for (int i = 0; i < integerCount; i++)
         {
             m_data[i] = stream.ReadInt32(endian);
         }
     }
 
     /// <summary>
-    ///     Reads in the encoded data of the given byte length, for cases that the data to read does not match integer sizes.
+    /// Reads in the encoded data of the given byte length, for cases that the data to read does not match integer sizes.
     /// </summary>
-    /// <param name="stream">The <see cref="DataStream" /> the encoded data gets read from.</param>
-    /// <param name="byteCount">The number of <see cref="byte" />s to read.</param>
-    /// <param name="endian">The <see cref="Endian" /> in which the encoded data gets read.</param>
+    /// <param name="stream">The <see cref="DataStream"/> the encoded data gets read from.</param>
+    /// <param name="byteCount">The number of <see cref="byte"/>s to read.</param>
+    /// <param name="endian">The <see cref="Endian"/> in which the encoded data gets read.</param>
     public void ReadOddSizedEncodedData(DataStream stream, uint byteCount, Endian endian = Endian.Little)
     {
-        var intLength = byteCount / 4;
+
+
+        uint intLength = byteCount / 4;
 
         m_data = new int[intLength + 1];
 
-        for (var i = 0; i < intLength; i++)
+        for (int i = 0; i < intLength; i++)
         {
             m_data[i] = stream.ReadInt32(endian);
         }
 
         // read remaining bytes as full int
-        var remaining = new byte[4];
+        byte[] remaining = new byte[4];
         stream.ReadBytes((int)byteCount % 4).CopyTo(remaining, 0);
 
-        var switchBytes = (endian == Endian.Little && !BitConverter.IsLittleEndian) ||
-                          (endian == Endian.Big && BitConverter.IsLittleEndian);
+        bool switchBytes = (endian == Endian.Little && !BitConverter.IsLittleEndian) || (endian == Endian.Big && BitConverter.IsLittleEndian);
         if (switchBytes)
         {
             remaining = remaining.Reverse().ToArray();
         }
-
         // might be better to replace this with the same method used in the DataStream readInt method
         m_data[intLength] = BitConverter.ToInt32(remaining);
     }
 
     /// <summary>
-    ///     Reads a Huffman encoded string.
+    /// Reads a Huffman encoded string.
     /// </summary>
     /// <param name="bitIndex">The index of the bit at which the encoded string starts.</param>
     /// <returns>The Huffman decoded string.</returns>
@@ -212,25 +211,21 @@ public class HuffmanDecoder
     {
         if (m_rootNode == null || m_data == null)
         {
-            var rootNodeMissingErrorPart = m_rootNode != null
-                ? ""
-                : " The root node was not established by calling 'ReadHuffmanTable'!";
-            var dataMissingErrorPart =
-                m_data != null ? "" : " No huffman encoded data was read with 'ReadEncodedData'!";
-            throw new InvalidDataException(string.Format("HuffmanDecoder state is not initialized!{0}{1}",
-                rootNodeMissingErrorPart, dataMissingErrorPart));
+            string rootNodeMissingErrorPart = m_rootNode != null ? "" : " The root node was not established by calling 'ReadHuffmanTable'!";
+            string dataMissingErrorPart = m_data != null ? "" : " No huffman encoded data was read with 'ReadEncodedData'!";
+            throw new InvalidDataException(string.Format("HuffmanDecoder state is not initialized!{0}{1}", rootNodeMissingErrorPart, dataMissingErrorPart));
         }
 
-        var dataLengthInBits = m_data.Length * 32;
+        int dataLengthInBits = m_data.Length * 32;
 
         StringBuilder sb = new();
         while (true)
         {
-            var node = m_rootNode;
+            HuffmanNode node = m_rootNode;
 
             while (!node.IsLeaf && bitIndex < dataLengthInBits)
             {
-                var bit = (m_data[bitIndex / 32] >> (bitIndex % 32)) & 1;
+                int bit = (m_data[bitIndex / 32] >> (bitIndex % 32)) & 1;
                 if (bit == 0)
                 {
                     node = node.Left!;
@@ -239,7 +234,6 @@ public class HuffmanDecoder
                 {
                     node = node.Right!;
                 }
-
                 bitIndex++;
             }
 

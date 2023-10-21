@@ -12,10 +12,9 @@ public class LegacyDeobfuscator : IDeobfuscator
         {
             return;
         }
-
-        for (var i = 0; i < data.Size; i++)
+        for (int i = 0; i < data.Size; i++)
         {
-            data[i] ^= (byte)(0x7B ^ header[0x128 + (i % 0x101)]);
+            data[i] ^= (byte)(0x7B ^ header[0x128 + i % 0x101]);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using Frosty.Sdk.IO;
+using Frosty.Sdk.Profiles;
 using Frosty.Sdk.Sdk.TypeInfoDatas;
 using Frosty.Sdk.Sdk.TypeInfos;
 
@@ -8,19 +9,6 @@ namespace Frosty.Sdk.Sdk;
 
 internal class TypeInfo
 {
-    public static readonly Dictionary<long, TypeInfo> TypeInfoMapping = new();
-
-    protected TypeInfoData m_data;
-    protected ushort m_flags;
-    protected ushort m_id;
-    protected long p_next;
-    protected long p_prev;
-
-    public TypeInfo(TypeInfoData data)
-    {
-        m_data = data;
-    }
-
     public static int Version
     {
         get
@@ -30,28 +18,24 @@ internal class TypeInfo
                 // 2013.2, 2014.1
                 return 1;
             }
-
             if (ProfilesLibrary.FrostbiteVersion <= "2014.4.17")
             {
                 // ushort FieldCount
                 // 2014.4.11, 2014.4.17
                 return 2;
             }
-
             if (ProfilesLibrary.FrostbiteVersion <= "2015.4.6")
             {
                 // ArrayInfo in TypeInfoData
                 // 2015.4, 2015.4.6
                 return 3;
             }
-
             if (ProfilesLibrary.FrostbiteVersion <= "2016.4.7")
             {
                 // Signature Guid in TypeInfo
                 // 2016.4.1, 2016.4.4, 2016.4.7, (2018.0 (BfV), 2019-PR5 (SWBfII) -> changed to 2016.4.4)
                 return 4;
             }
-
             if (ProfilesLibrary.FrostbiteVersion <= "2018.2")
             {
                 // Guid and NameHash in TypeInfoData
@@ -65,21 +49,34 @@ internal class TypeInfo
         }
     }
 
+    public static readonly Dictionary<long, TypeInfo> TypeInfoMapping = new();
+
+    protected TypeInfoData m_data;
+    protected long p_prev;
+    protected long p_next;
+    protected ushort m_id;
+    protected ushort m_flags;
+
+    public TypeInfo(TypeInfoData data)
+    {
+        m_data = data;
+    }
+
     public static TypeInfo ReadTypeInfo(MemoryReader reader)
     {
-        var startPos = reader.Position;
+        long startPos = reader.Position;
 
-        var typeInfoDataOffset = reader.ReadLong();
+        long typeInfoDataOffset = reader.ReadLong();
 
-        var curPos = reader.Position;
+        long curPos = reader.Position;
 
         reader.Position = typeInfoDataOffset;
 
-        var data = TypeInfoData.ReadTypeInfoData(reader);
+        TypeInfoData data = TypeInfoData.ReadTypeInfoData(reader);
 
         reader.Position = curPos;
 
-        var retVal = CreateTypeInfo(data);
+        TypeInfo retVal = CreateTypeInfo(data);
 
         retVal.Read(reader);
 
@@ -94,32 +91,26 @@ internal class TypeInfo
         {
             return new StructInfo(structData);
         }
-
         if (data is ClassInfoData classData)
         {
             return new ClassInfo(classData);
         }
-
         if (data is ArrayInfoData arrayData)
         {
             return new ArrayInfo(arrayData);
         }
-
         if (data is EnumInfoData enumData)
         {
             return new EnumInfo(enumData);
         }
-
         if (data is FunctionInfoData functionData)
         {
             return new FunctionInfo(functionData);
         }
-
         if (data is DelegateInfoData delegateData)
         {
             return new DelegateInfo(delegateData);
         }
-
         return new TypeInfo(data);
     }
 
@@ -136,7 +127,6 @@ internal class TypeInfo
         {
             m_data.SetGuid(reader.ReadGuid());
         }
-
         if (Version == 4 || Version == 5)
         {
             // signature
@@ -153,20 +143,13 @@ internal class TypeInfo
         {
             return null;
         }
-
         reader.Position = p_next;
         return ReadTypeInfo(reader);
     }
+    
+    public string GetName() => m_data.CleanUpName();
 
-    public string GetName()
-    {
-        return m_data.CleanUpName();
-    }
-
-    public TypeFlags GetFlags()
-    {
-        return m_data.GetFlags();
-    }
+    public TypeFlags GetFlags() => m_data.GetFlags();
 
     public void CreateType(StringBuilder sb)
     {

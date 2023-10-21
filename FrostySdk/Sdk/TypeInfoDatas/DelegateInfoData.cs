@@ -7,7 +7,7 @@ namespace Frosty.Sdk.Sdk.TypeInfoDatas;
 
 internal class DelegateInfoData : TypeInfoData
 {
-    private readonly List<ParameterInfo> m_parameterInfos = new();
+    private List<ParameterInfo> m_parameterInfos = new();
 
     public override void Read(MemoryReader reader)
     {
@@ -18,10 +18,10 @@ internal class DelegateInfoData : TypeInfoData
             m_name = $"Delegate_{m_nameHash:x8}";
         }
 
-        var pParameterInfos = reader.ReadLong();
+        long pParameterInfos = reader.ReadLong();
 
         reader.Position = pParameterInfos;
-        for (var i = 0; i < m_fieldCount; i++)
+        for (int i = 0; i < m_fieldCount; i++)
         {
             m_parameterInfos.Add(new ParameterInfo());
             m_parameterInfos[i].Read(reader);
@@ -32,16 +32,16 @@ internal class DelegateInfoData : TypeInfoData
     {
         base.CreateType(sb);
 
-        var returnType = "void";
+        string returnType = "void";
 
         StringBuilder inputParams = new();
-        var hasReturn = false;
+        bool hasReturn = false;
 
-        foreach (var parameterInfo in m_parameterInfos)
+        foreach (ParameterInfo parameterInfo in m_parameterInfos)
         {
-            var type = parameterInfo.GetTypeInfo();
+            TypeInfo type = parameterInfo.GetTypeInfo();
 
-            var typeName = type.GetName();
+            string typeName = type.GetName();
 
             if (type is ArrayInfo array)
             {
@@ -58,7 +58,10 @@ internal class DelegateInfoData : TypeInfoData
                     {
                         hasReturn = true;
                     }
+                    else
+                    {
 
+                    }
                     returnType = typeName;
                     break;
                 case 2:
@@ -69,7 +72,10 @@ internal class DelegateInfoData : TypeInfoData
                     {
                         hasReturn = true;
                     }
+                    else
+                    {
 
+                    }
                     returnType = $"{typeName}*";
                     break;
             }

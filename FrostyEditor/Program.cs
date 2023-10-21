@@ -12,9 +12,7 @@ internal class Program
     }
 
     public static AppBuilder BuildAvaloniaApp()
-    {
-        return AppBuilder.Configure<App>()
+        => AppBuilder.Configure<App>()
             .UsePlatformDetect()
             .LogToTrace();
-    }
 }

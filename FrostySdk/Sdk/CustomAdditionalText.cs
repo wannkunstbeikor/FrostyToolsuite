@@ -9,13 +9,13 @@ public class CustomAdditionalText : AdditionalText
 {
     private readonly string m_text;
 
+    public override string Path { get; }
+
     public CustomAdditionalText(string path)
     {
         Path = path;
         m_text = File.ReadAllText(path);
     }
-
-    public override string Path { get; }
 
     public override SourceText GetText(CancellationToken cancellationToken = new())
     {

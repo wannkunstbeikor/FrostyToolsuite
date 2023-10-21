@@ -8,15 +8,15 @@ namespace Frosty.Sdk.Managers.Infos.FileInfos;
 
 public class PathFileInfo : IFileInfo
 {
-    private readonly uint m_logicalOffset;
-    private readonly uint m_offset;
-    private readonly string m_path = string.Empty;
-    private readonly uint m_size;
+    private string m_path = string.Empty;
+    private uint m_offset;
+    private uint m_size;
+    private uint m_logicalOffset;
 
     internal PathFileInfo()
     {
     }
-
+    
     public PathFileInfo(string inPath, uint inOffset, uint inSize, uint inLogicalOffset)
     {
         m_path = inPath;
@@ -25,10 +25,7 @@ public class PathFileInfo : IFileInfo
         m_logicalOffset = inLogicalOffset;
     }
 
-    public bool IsComplete()
-    {
-        return m_logicalOffset != 0;
-    }
+    public bool IsComplete() => m_logicalOffset != 0;
 
     public Block<byte> GetRawData()
     {
@@ -37,7 +34,7 @@ public class PathFileInfo : IFileInfo
             stream.Position = m_offset;
 
             Block<byte> retVal = new((int)m_size);
-
+            
             stream.ReadExactly(retVal);
             return retVal;
         }
@@ -45,12 +42,12 @@ public class PathFileInfo : IFileInfo
 
     public Block<byte> GetData(int originalSize = 0)
     {
-        using (var stream = BlockStream.FromFile(FileSystemManager.ResolvePath(m_path), m_offset, (int)m_size))
+        using (BlockStream stream = BlockStream.FromFile(FileSystemManager.ResolvePath(m_path), m_offset, (int)m_size))
         {
             return Cas.DecompressData(stream, originalSize);
         }
     }
-
+    
     void IFileInfo.SerializeInternal(DataStream stream)
     {
         stream.WriteNullTerminatedString(m_path);
@@ -72,7 +69,7 @@ public class PathFileInfo : IFileInfo
                m_size == b.m_size &&
                m_logicalOffset == b.m_logicalOffset;
     }
-
+    
     public override bool Equals(object? obj)
     {
         if (obj is PathFileInfo b)

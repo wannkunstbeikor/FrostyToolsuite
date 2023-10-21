@@ -1,6 +1,9 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Avalonia.Input;
+using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Dock.Model.Controls;
 using Dock.Model.Core;
@@ -13,10 +16,12 @@ namespace FrostyEditor.ViewModels;
 
 public partial class MainWindowViewModel : ObservableObject, IDropTarget
 {
-    private readonly FileViewModel m_defaultPage = new DefaultPageViewModel { Title = "Home" };
     private readonly IFactory m_factory = new DockFactory();
 
-    [ObservableProperty] private IRootDock? m_layout;
+    private readonly FileViewModel m_defaultPage = new DefaultPageViewModel { Title = "Home" };
+    
+    [ObservableProperty]
+    private IRootDock? m_layout;
 
     public MainWindowViewModel()
     {
@@ -25,35 +30,6 @@ public partial class MainWindowViewModel : ObservableObject, IDropTarget
         if (Layout is not null)
         {
             m_factory.InitLayout(Layout);
-        }
-    }
-
-    public void DragOver(object? sender, DragEventArgs e)
-    {
-        if (!e.Data.Contains(DataFormats.Files))
-        {
-            e.DragEffects = DragDropEffects.None;
-            e.Handled = true;
-        }
-    }
-
-    public void Drop(object? sender, DragEventArgs e)
-    {
-        if (e.Data.Contains(DataFormats.Files))
-        {
-            var result = e.Data.GetFiles();
-            if (result is not null)
-            {
-                foreach (var path in result)
-                {
-                    if (!string.IsNullOrEmpty(path.Path.LocalPath))
-                    {
-                        // check if its a fbproject and then load it
-                    }
-                }
-            }
-
-            e.Handled = true;
         }
     }
 
@@ -69,17 +45,17 @@ public partial class MainWindowViewModel : ObservableObject, IDropTarget
             if (ProfilesLibrary.RequiresKey)
             {
                 // TODO: key window
-                var keyPath = $"Keys/{ProfilesLibrary.InternalName}.key";
+                string keyPath = $"Keys/{ProfilesLibrary.InternalName}.key";
                 if (File.Exists(keyPath))
                 {
-                    using (var stream = BlockStream.FromFile(keyPath, false))
+                    using (BlockStream stream = BlockStream.FromFile(keyPath, false))
                     {
                         if (stream.Length < 0x10)
                         {
                             return false;
                         }
-
-                        var initFsKey = new byte[0x10];
+                        
+                        byte[] initFsKey = new byte[0x10];
                         stream.ReadExactly(initFsKey);
                         KeyManager.AddKey("InitFsKey", initFsKey);
 
@@ -90,7 +66,7 @@ public partial class MainWindowViewModel : ObservableObject, IDropTarget
                     }
                 }
             }
-
+                
             // init filesystem manager, this parses the layout.toc file
             if (!FileSystemManager.Initialize(inProfilePath))
             {
@@ -98,7 +74,7 @@ public partial class MainWindowViewModel : ObservableObject, IDropTarget
             }
 
             // generate sdk if needed
-            var sdkPath = $"Sdk/{ProfilesLibrary.SdkFilename}.dll";
+            string sdkPath = $"Sdk/{ProfilesLibrary.SdkFilename}.dll";
             // if (!File.Exists(sdkPath))
             // {
             //     TypeSdkGenerator typeSdkGenerator = new();
@@ -130,13 +106,13 @@ public partial class MainWindowViewModel : ObservableObject, IDropTarget
             // {
             //     return false;
             // }
-
+            
             // init resource manager, this parses the cas.cat files if they exist for easy asset lookup
             if (!ResourceManager.Initialize())
             {
                 return false;
             }
-
+            
             // init asset manager, this parses the SuperBundles and loads all the assets
             if (!AssetManager.Initialize())
             {
@@ -149,7 +125,7 @@ public partial class MainWindowViewModel : ObservableObject, IDropTarget
 
     private void AddFileViewModel(FileViewModel fileViewModel)
     {
-        var files = m_factory.GetDockable<IDocumentDock>("Files");
+        IDocumentDock? files = m_factory.GetDockable<IDocumentDock>("Files");
         if (Layout is not null && files is not null)
         {
             m_factory.AddDockable(files, fileViewModel);
@@ -160,14 +136,11 @@ public partial class MainWindowViewModel : ObservableObject, IDropTarget
 
     private FileViewModel? GetActiveFileViewModel()
     {
-        var files = m_factory.GetDockable<IDocumentDock>("Files");
+        IDocumentDock? files = m_factory.GetDockable<IDocumentDock>("Files");
         return files?.ActiveDockable as FileViewModel;
     }
 
-    private FileViewModel GetDefaultPageViewModel()
-    {
-        return m_defaultPage;
-    }
+    private FileViewModel GetDefaultPageViewModel() => m_defaultPage;
 
     public void CloseLayout()
     {
@@ -177,6 +150,34 @@ public partial class MainWindowViewModel : ObservableObject, IDropTarget
             {
                 dock.Close.Execute(null);
             }
+        }
+    }
+
+    public void DragOver(object? sender, DragEventArgs e)
+    {
+        if (!e.Data.Contains(DataFormats.Files))
+        {
+            e.DragEffects = DragDropEffects.None; 
+            e.Handled = true;
+        }
+    }
+
+    public void Drop(object? sender, DragEventArgs e)
+    {
+        if (e.Data.Contains(DataFormats.Files))
+        {
+            IEnumerable<IStorageItem>? result = e.Data.GetFiles();
+            if (result is not null)
+            {
+                foreach (IStorageItem path in result)
+                {
+                    if (!string.IsNullOrEmpty(path.Path.LocalPath))
+                    {
+                        // check if its a fbproject and then load it
+                    }
+                }
+            }
+            e.Handled = true;
         }
     }
 }

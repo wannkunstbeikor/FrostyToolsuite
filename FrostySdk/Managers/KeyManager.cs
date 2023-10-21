@@ -8,13 +8,13 @@ public static class KeyManager
 
     public static void AddKey(string id, byte[] data)
     {
-        var hash = Utils.Utils.HashString(id);
+        int hash = Utils.Utils.HashString(id);
         s_keys.TryAdd(hash, data);
     }
 
     public static byte[] GetKey(string id)
     {
-        var hash = Utils.Utils.HashString(id);
+        int hash = Utils.Utils.HashString(id);
         if (!s_keys.ContainsKey(hash))
         {
             throw new KeyNotFoundException($"Could not find key with id: {id}");
@@ -23,8 +23,5 @@ public static class KeyManager
         return s_keys[hash];
     }
 
-    public static bool HasKey(string id)
-    {
-        return s_keys.ContainsKey(Utils.Utils.HashString(id));
-    }
+    public static bool HasKey(string id) => s_keys.ContainsKey(Utils.Utils.HashString(id));
 }

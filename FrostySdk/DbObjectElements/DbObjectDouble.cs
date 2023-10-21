@@ -16,7 +16,7 @@ public class DbObjectDouble : DbObject
     {
         m_value = inValue;
     }
-
+    
     public DbObjectDouble(string inName, double inValue)
         : base(Type.Double, inName)
     {

@@ -7,6 +7,27 @@ namespace Frosty.Sdk;
 
 public abstract class DbObject
 {
+    [Flags]
+    protected internal enum Type
+    {
+        Null = 0,
+        List = 1,
+        Dict = 2,
+        Boolean = 6,
+        String = 7,
+        Int = 8,
+        Long = 9,
+        Float = 11,
+        Double = 12,
+        Guid = 15,
+        Sha1 = 16,
+        Blob = 19,
+        
+        Anonymous = 1 << 7
+    }
+    
+    public string Name { get; private set; }
+
     private readonly Type m_type;
 
     protected DbObject(Type inType)
@@ -21,13 +42,11 @@ public abstract class DbObject
         Name = inName;
     }
 
-    public string Name { get; private set; }
-
     /// <summary>
-    ///     Serializes a <see cref="DbObject" /> to a file.
+    /// Serializes a <see cref="DbObject"/> to a file.
     /// </summary>
     /// <param name="path">The path of the file.</param>
-    /// <param name="value">The <see cref="DbObject" /> to serialize.</param>
+    /// <param name="value">The <see cref="DbObject"/> to serialize.</param>
     public static void Serialize(string path, DbObject value)
     {
         using (DataStream stream = new(new FileStream(path, FileMode.Create, FileAccess.ReadWrite)))
@@ -35,78 +54,72 @@ public abstract class DbObject
             Serialize(stream, value);
         }
     }
-
+    
     /// <summary>
-    ///     Serializes a <see cref="DbObject" /> to a <see cref="DataStream" />.
+    /// Serializes a <see cref="DbObject"/> to a <see cref="DataStream"/>.
     /// </summary>
-    /// <param name="stream">The <see cref="DataStream" /> to serialize the <see cref="DbObject" /> to.</param>
-    /// <param name="value">The <see cref="DbObject" /> to serialize.</param>
+    /// <param name="stream">The <see cref="DataStream"/> to serialize the <see cref="DbObject"/> to.</param>
+    /// <param name="value">The <see cref="DbObject"/> to serialize.</param>
     public static void Serialize(DataStream stream, DbObject value)
     {
         stream.WriteByte((byte)value.m_type);
-
+        
         if (!value.m_type.HasFlag(Type.Anonymous))
         {
             stream.WriteNullTerminatedString(value.Name);
         }
-
+        
         value.InternalSerialize(stream);
     }
 
     /// <summary>
-    ///     Deserializes a <see cref="DbObject" /> from a file.
+    /// Deserializes a <see cref="DbObject"/> from a file.
     /// </summary>
     /// <param name="path">The path of the file.</param>
-    /// <returns>The deserialized <see cref="DbObject" />.</returns>
+    /// <returns>The deserialized <see cref="DbObject"/>.</returns>
     public static DbObject? Deserialize(string path)
     {
-        using (var stream = BlockStream.FromFile(path, true))
+        using (BlockStream stream = BlockStream.FromFile(path, true))
         {
             return Deserialize(stream);
         }
     }
 
     /// <summary>
-    ///     Deserializes a <see cref="DbObject" /> from a <see cref="DataStream" />.
+    /// Deserializes a <see cref="DbObject"/> from a <see cref="DataStream"/>.
     /// </summary>
-    /// <param name="stream">The <see cref="DataStream" /> to deserialize the <see cref="DbObject" /> from.</param>
-    /// <returns>The deserialized <see cref="DbObject" />.</returns>
+    /// <param name="stream">The <see cref="DataStream"/> to deserialize the <see cref="DbObject"/> from.</param>
+    /// <returns>The deserialized <see cref="DbObject"/>.</returns>
     public static DbObject? Deserialize(DataStream stream)
     {
-        var type = (Type)stream.ReadByte();
-
-        var obj = CreateDbObject(type);
+        Type type = (Type)stream.ReadByte();
+        
+        DbObject? obj = CreateDbObject(type);
 
         if (obj is null)
         {
             return obj;
         }
-
+        
         if (!type.HasFlag(Type.Anonymous))
         {
             obj.Name = stream.ReadNullTerminatedString();
         }
-
+        
         obj.InternalDeserialize(stream);
 
         return obj;
     }
 
-    public virtual bool IsDict()
-    {
-        return false;
-    }
-
+    public virtual bool IsDict() => false;
+    
     public virtual DbObjectDict AsDict()
     {
         throw new Exception();
     }
 
-    public virtual bool IsList()
-    {
-        return false;
-    }
-
+    public virtual bool IsList() => false;
+    
     public virtual DbObjectList AsList()
     {
         throw new Exception();
@@ -167,28 +180,13 @@ public abstract class DbObject
         throw new Exception();
     }
 
-    public static DbObjectDict CreateDict(int capacity = 0)
-    {
-        return new DbObjectDict(capacity);
-    }
-
-    public static DbObjectDict CreateDict(string name, int capacity = 0)
-    {
-        return new DbObjectDict(name, capacity);
-    }
-
-    public static DbObjectList CreateList(int capacity = 0)
-    {
-        return new DbObjectList(capacity);
-    }
-
-    public static DbObjectList CreateList(string name, int capacity = 0)
-    {
-        return new DbObjectList(name, capacity);
-    }
-
+    public static DbObjectDict CreateDict(int capacity = 0) => new(capacity);
+    public static DbObjectDict CreateDict(string name, int capacity = 0) => new(name, capacity);
+    public static DbObjectList CreateList(int capacity = 0) => new(capacity);
+    public static DbObjectList CreateList(string name, int capacity = 0) => new(name, capacity);
+    
     protected abstract void InternalSerialize(DataStream stream);
-
+    
     protected abstract void InternalDeserialize(DataStream stream);
 
     private static DbObject? CreateDbObject(Type type)
@@ -236,24 +234,5 @@ public abstract class DbObject
         }
 
         return obj;
-    }
-
-    [Flags]
-    protected internal enum Type
-    {
-        Null = 0,
-        List = 1,
-        Dict = 2,
-        Boolean = 6,
-        String = 7,
-        Int = 8,
-        Long = 9,
-        Float = 11,
-        Double = 12,
-        Guid = 15,
-        Sha1 = 16,
-        Blob = 19,
-
-        Anonymous = 1 << 7
     }
 }

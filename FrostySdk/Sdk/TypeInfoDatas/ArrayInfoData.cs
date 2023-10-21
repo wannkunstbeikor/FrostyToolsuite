@@ -7,12 +7,9 @@ namespace Frosty.Sdk.Sdk.TypeInfoDatas;
 
 internal class ArrayInfoData : TypeInfoData
 {
-    private long p_typeInfo;
+    public TypeInfo GetTypeInfo() => TypeInfo.TypeInfoMapping[p_typeInfo];
 
-    public TypeInfo GetTypeInfo()
-    {
-        return TypeInfo.TypeInfoMapping[p_typeInfo];
-    }
+    private long p_typeInfo;
 
     public override void Read(MemoryReader reader)
     {
@@ -32,7 +29,6 @@ internal class ArrayInfoData : TypeInfoData
         {
             sb.AppendLine($"[{nameof(ArrayGuidAttribute)}(\"{m_guid}\")]");
         }
-
         if (m_nameHash != 0)
         {
             sb.AppendLine($"[{nameof(ArrayHashAttribute)}({(int)m_nameHash})]");

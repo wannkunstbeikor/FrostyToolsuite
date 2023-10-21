@@ -2,6 +2,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace FrostyEditor.ViewModels;
 
-public class MenuViewModel : ObservableObject
+public partial class MenuViewModel : ObservableObject
 {
 }

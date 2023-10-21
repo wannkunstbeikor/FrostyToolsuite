@@ -16,7 +16,7 @@ public class DbObjectBool : DbObject
     {
         m_value = inValue;
     }
-
+    
     public DbObjectBool(string inName, bool inValue)
         : base(Type.Boolean, inName)
     {

@@ -9,36 +9,36 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Assets\*"/>
-    <None Update="Profiles\*.json" CopyToOutputDirectory="PreserveNewest"/>
+    <None Remove="Assets\*" />
+    <None Update="Profiles\*.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
-    <AvaloniaResource Include="Assets\*"/>
+    <AvaloniaResource Include="Assets\*" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.0.0"/>
-    <PackageReference Include="Avalonia.Controls.TreeDataGrid" Version="11.0.0"/>
-    <PackageReference Include="Avalonia.Desktop" Version="11.0.0"/>
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.0"/>
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.0"/>
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1"/>
-    <PackageReference Include="Dock.Avalonia" Version="11.0.0"/>
-    <PackageReference Include="Dock.Model" Version="11.0.0"/>
-    <PackageReference Include="Dock.Model.Mvvm" Version="11.0.0"/>
-    <PackageReference Include="Dock.Serializer" Version="11.0.0"/>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.6.0"/>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.6.0"/>
-    <PackageReference Include="Microsoft.CodeAnalysis.Scripting.Common" Version="4.6.0"/>
+    <PackageReference Include="Avalonia" Version="11.0.0" />
+    <PackageReference Include="Avalonia.Controls.TreeDataGrid" Version="11.0.0" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.0.0" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.0" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.0" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
+    <PackageReference Include="Dock.Avalonia" Version="11.0.0" />
+    <PackageReference Include="Dock.Model" Version="11.0.0" />
+    <PackageReference Include="Dock.Model.Mvvm" Version="11.0.0" />
+    <PackageReference Include="Dock.Serializer" Version="11.0.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.6.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.6.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Scripting.Common" Version="4.6.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FrostySdk\FrostySdk.csproj"/>
+    <ProjectReference Include="..\FrostySdk\FrostySdk.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <EditorConfigFiles Include=".editorconfig"/>
+    <EditorConfigFiles Include=".editorconfig" />
   </ItemGroup>
-
+  
 </Project>

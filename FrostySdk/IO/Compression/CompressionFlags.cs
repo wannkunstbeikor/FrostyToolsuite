@@ -9,5 +9,5 @@ public enum CompressionFlags
     ZStdUseDicts = 1 << 0,
     OodleKraken = 1 << 1,
     OodleSelkie = 1 << 2,
-    OodleLeviathan = 1 << 3
+    OodleLeviathan = 1 << 3,
 }

@@ -9,20 +9,11 @@ public readonly struct FileRef
         m_fileName = value;
     }
 
-    public static implicit operator string(FileRef value)
-    {
-        return value.m_fileName;
-    }
+    public static implicit operator string(FileRef value) => value.m_fileName;
 
-    public static implicit operator FileRef(string value)
-    {
-        return new FileRef(value);
-    }
+    public static implicit operator FileRef(string value) => new(value);
 
-    public override string ToString()
-    {
-        return $"FileRef '{m_fileName}'";
-    }
+    public override string ToString() => $"FileRef '{m_fileName}'";
 
     public override bool Equals(object? obj)
     {
@@ -39,15 +30,9 @@ public readonly struct FileRef
         return m_fileName == b.m_fileName;
     }
 
-    public static bool operator ==(FileRef a, object b)
-    {
-        return a.Equals(b);
-    }
+    public static bool operator ==(FileRef a, object b) => a.Equals(b);
 
-    public static bool operator !=(FileRef a, object b)
-    {
-        return !a.Equals(b);
-    }
+    public static bool operator !=(FileRef a, object b) => !a.Equals(b);
 
     public override int GetHashCode()
     {
