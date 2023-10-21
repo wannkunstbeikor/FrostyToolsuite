@@ -1,4 +1,3 @@
-// Use JetBrains Rider or JetBrains ReSharper for better EditorConfig support
 
 // namespaces should be file scoped
 namespace Frosty.CodingStandards;
