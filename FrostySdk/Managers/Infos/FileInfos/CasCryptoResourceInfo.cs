@@ -8,20 +8,22 @@ namespace Frosty.Sdk.Managers.Infos.FileInfos;
 public class CasCryptoResourceInfo : CasResourceInfo
 {
     private readonly string m_keyId;
-    
-    public CasCryptoResourceInfo(CasFileIdentifier inCasFileIdentifier, uint inOffset, uint inSize, uint inLogicalOffset, string inKeyId)
+
+    public CasCryptoResourceInfo (CasFileIdentifier inCasFileIdentifier, uint inOffset, uint inSize,
+        uint inLogicalOffset, string inKeyId)
         : base(inCasFileIdentifier, inOffset, inSize, inLogicalOffset)
     {
         m_keyId = inKeyId;
     }
 
-    public CasCryptoResourceInfo(bool inIsPatch, int inInstallChunkIndex, int inCasIndex, uint inOffset, uint inSize, uint inLogicalOffset, string inKeyId)
+    public CasCryptoResourceInfo (bool inIsPatch, int inInstallChunkIndex, int inCasIndex, uint inOffset, uint inSize,
+        uint inLogicalOffset, string inKeyId)
         : base(inIsPatch, inInstallChunkIndex, inCasIndex, inOffset, inSize, inLogicalOffset)
     {
         m_keyId = inKeyId;
     }
 
-    public override Block<byte> GetRawData()
+    public override Block<byte> GetRawData ()
     {
         using (FileStream stream = new(GetPath(), FileMode.Open, FileAccess.Read))
         {
@@ -31,13 +33,13 @@ public class CasCryptoResourceInfo : CasResourceInfo
             int size = (int)GetSize();
             size += size & 15;
             Block<byte> retVal = new(size);
-            
+
             stream.ReadExactly(retVal);
             return retVal;
         }
     }
 
-    public override Block<byte> GetData(int inOriginalSize)
+    public override Block<byte> GetData (int inOriginalSize)
     {
         // we need to align the size to 16
         int size = (int)GetSize();
@@ -49,13 +51,13 @@ public class CasCryptoResourceInfo : CasResourceInfo
         }
     }
 
-    internal static void SerializeInternal(DataStream stream, CasCryptoResourceInfo info)
+    internal static void SerializeInternal (DataStream stream, CasCryptoResourceInfo info)
     {
         CasResourceInfo.SerializeInternal(stream, info);
         stream.WriteNullTerminatedString(info.m_keyId);
     }
 
-    internal static CasCryptoResourceInfo DeserializeInternal(DataStream stream)
+    internal static CasCryptoResourceInfo DeserializeInternal (DataStream stream)
     {
         CasFileIdentifier file = CasFileIdentifier.FromFileIdentifier(stream.ReadUInt32());
         uint offset = stream.ReadUInt32();

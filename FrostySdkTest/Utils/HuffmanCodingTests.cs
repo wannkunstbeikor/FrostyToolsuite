@@ -9,7 +9,6 @@ namespace FrostySdkTest.Utils
 {
     public class HuffmanEncodingTests
     {
-
         private static readonly object[] EncodingDecodingTestValues =
         {
             new object[] { false, 25 },
@@ -53,7 +52,6 @@ namespace FrostySdkTest.Utils
                     ds.Position = 0;
 
                     decoder.ReadHuffmanTable(new DataStream(stream), (uint)encodingTree.Count);
-
                 }
             }
 
@@ -61,7 +59,6 @@ namespace FrostySdkTest.Utils
             {
                 using (DataStream ds = new(stream))
                 {
-
                     var byteArray = encodingResult.EncodedTexts;
 
                     ds.Write(byteArray);

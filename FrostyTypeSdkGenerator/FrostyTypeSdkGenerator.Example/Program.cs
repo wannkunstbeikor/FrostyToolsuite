@@ -15,7 +15,7 @@ namespace FrostyTypeSdkGenerator.Example
             {
                 1, 2, 3
             };
-            
+
             List<int> test2 = new()
             {
                 1, 2, 3
@@ -26,17 +26,18 @@ namespace FrostyTypeSdkGenerator.Example
 
             Asset asset = new();
             //asset.SetInstanceGuid(new AssetClassGuid());
-            
+
             Console.WriteLine(data1.Equals(data2));
         }
     }
 
     // testing some classes and structs
-    
+
     public partial struct AssetData
     {
         [EbxFieldMeta(TypeFlags.TypeEnum.CString, 0u)]
         private Frosty.Sdk.Ebx.CString _Name;
+
         private int _Count;
         private bool _IsEnabled;
 
@@ -46,6 +47,4 @@ namespace FrostyTypeSdkGenerator.Example
         public void SetCount(int count) => _Count = count;
         public void SetIsEnabled(bool isEnabled) => _IsEnabled = isEnabled;
     }
-
-    
 }

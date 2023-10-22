@@ -4,7 +4,7 @@ namespace Frosty.Sdk.Sdk.TypeInfoDatas;
 
 internal class PrimitiveInfoData : TypeInfoData
 {
-    public override void CreateType(StringBuilder sb)
+    public override void CreateType (StringBuilder sb)
     {
         string actualType = string.Empty;
 

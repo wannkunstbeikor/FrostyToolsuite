@@ -10,7 +10,7 @@ internal class StructInfoData : TypeInfoData
 {
     private List<FieldInfo> m_fieldInfos = new List<FieldInfo>();
 
-    public override void Read(MemoryReader reader)
+    public override void Read (MemoryReader reader)
     {
         base.Read(reader);
 
@@ -45,7 +45,7 @@ internal class StructInfoData : TypeInfoData
         }
     }
 
-    public override void CreateType(StringBuilder sb)
+    public override void CreateType (StringBuilder sb)
     {
         if (m_name.Contains("::"))
         {
@@ -53,7 +53,7 @@ internal class StructInfoData : TypeInfoData
             sb.AppendLine($"public partial struct {m_name[..m_name.IndexOf("::", StringComparison.Ordinal)]}");
             sb.AppendLine("{");
         }
-        
+
         base.CreateType(sb);
 
         sb.AppendLine($"public partial struct {CleanUpName()}");
@@ -66,9 +66,9 @@ internal class StructInfoData : TypeInfoData
             sb.AppendLine($"[{nameof(FieldIndexAttribute)}({i})]");
             m_fieldInfos[i].CreateField(sb);
         }
-        
+
         sb.AppendLine("}");
-        
+
         if (m_name.Contains("::"))
         {
             sb.AppendLine("}");

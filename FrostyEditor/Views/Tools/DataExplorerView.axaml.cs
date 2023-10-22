@@ -4,7 +4,7 @@ namespace FrostyEditor.Views.Tools;
 
 public partial class DataExplorerView : UserControl
 {
-    public DataExplorerView()
+    public DataExplorerView ()
     {
         InitializeComponent();
     }

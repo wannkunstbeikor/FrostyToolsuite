@@ -5,5 +5,5 @@ namespace Frosty.Sdk.Interfaces;
 
 public interface IDeobfuscator
 {
-    public void Deobfuscate(Span<byte> header, Block<byte> data);
+    public void Deobfuscate (Span<byte> header, Block<byte> data);
 }

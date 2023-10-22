@@ -8,10 +8,10 @@ namespace Frosty.Sdk.IO.Ebx;
 public partial class EbxAsset
 {
     public Guid FileGuid => fileGuid;
+
     public Guid RootInstanceGuid
     {
-        get
-        {
+        get {
             AssetClassGuid guid = ((dynamic)RootObject).GetInstanceGuid();
             return guid.ExportedGuid;
         }
@@ -19,26 +19,25 @@ public partial class EbxAsset
 
     public IEnumerable<Guid> Dependencies
     {
-        get
-        {
+        get {
             foreach (Guid dependency in dependencies)
             {
                 yield return dependency;
             }
         }
     }
+
     public IEnumerable<object> Objects
     {
-        get
-        {
+        get {
             for (int i = 0; i < objects.Count; i++)
                 yield return objects[i];
         }
     }
+
     public IEnumerable<object> ExportedObjects
     {
-        get
-        {
+        get {
             for (int i = 0; i < objects.Count; i++)
             {
                 dynamic obj = objects[i];
@@ -50,6 +49,7 @@ public partial class EbxAsset
             }
         }
     }
+
     public object RootObject => objects[0];
     public bool IsValid => objects.Count != 0;
     public bool TransientEdit { get; set; }
@@ -58,11 +58,11 @@ public partial class EbxAsset
     internal List<object> objects = new();
     internal HashSet<Guid> dependencies = new();
 
-    public EbxAsset()
+    public EbxAsset ()
     {
     }
 
-    public EbxAsset(params object[] rootObjects)
+    public EbxAsset (params object[] rootObjects)
     {
         fileGuid = Guid.NewGuid();
 
@@ -76,11 +76,11 @@ public partial class EbxAsset
     /// <summary>
     /// Invoked when loading of the ebx asset has completed, to allow for any custom handling
     /// </summary>
-    public virtual void OnLoadComplete()
+    public virtual void OnLoadComplete ()
     {
     }
 
-    public dynamic? GetObject(Guid guid)
+    public dynamic? GetObject (Guid guid)
     {
         foreach (dynamic obj in ExportedObjects)
         {
@@ -89,10 +89,11 @@ public partial class EbxAsset
                 return obj;
             }
         }
+
         return null;
     }
 
-    public bool AddDependency(Guid guid)
+    public bool AddDependency (Guid guid)
     {
         if (dependencies.Contains(guid))
         {
@@ -103,9 +104,9 @@ public partial class EbxAsset
         return true;
     }
 
-    public void SetFileGuid(Guid guid) => fileGuid = guid;
+    public void SetFileGuid (Guid guid) => fileGuid = guid;
 
-    public void AddObject(dynamic obj, bool root = false)
+    public void AddObject (dynamic obj, bool root = false)
     {
         AssetClassGuid guid = obj.GetInstanceGuid();
         if (guid.InternalId == -1)
@@ -118,7 +119,7 @@ public partial class EbxAsset
         objects.Add(obj);
     }
 
-    public void RemoveObject(object obj)
+    public void RemoveObject (object obj)
     {
         int idx = objects.IndexOf(obj);
         if (idx == -1)
@@ -129,10 +130,10 @@ public partial class EbxAsset
         objects.RemoveAt(idx);
     }
 
-    public void Update()
+    public void Update ()
     {
         dependencies.Clear();
-        
+
         List<Tuple<PropertyInfo, object>> refProps = new();
         List<Tuple<object, Guid>> externalProps = new();
         List<object> objsToProcess = new();
@@ -197,7 +198,8 @@ public partial class EbxAsset
     private static readonly Type s_valueType = typeof(ValueType);
     private static readonly Type s_boxedValueType = typeof(BoxedValueRef);
 
-    private void CountRefs(object obj, object classObj, ref List<Tuple<PropertyInfo, object>> refProps, ref List<Tuple<object, Guid>> externalProps)
+    private void CountRefs (object obj, object classObj, ref List<Tuple<PropertyInfo, object>> refProps,
+        ref List<Tuple<object, Guid>> externalProps)
     {
         PropertyInfo[] pis = obj.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
         foreach (PropertyInfo pi in pis)

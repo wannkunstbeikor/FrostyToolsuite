@@ -13,15 +13,21 @@ public struct EbxTypeDescriptor
     public TypeFlags Flags;
     public ushort Size;
     public ushort SecondSize;
-    
-    public ushort GetFieldCount() => (ushort)(FieldCount | ((Alignment & 0x80) << 1));
-    public void SetFieldCount(ushort value) { FieldCount = (byte)value; Alignment = (byte)((Alignment & ~0x80) | ((value & 0x100) >> 1)); }
-    public byte GetAlignment() => (byte)(Alignment & 0x7F);
-    public void SetAlignment(byte value) => Alignment = (byte)((Alignment & ~0x7F) | value);
 
-    public bool IsSharedTypeDescriptorKey() => (FieldIndex & 0x80000000) != 0;
+    public ushort GetFieldCount () => (ushort)(FieldCount | ((Alignment & 0x80) << 1));
 
-    public Guid ToKey()
+    public void SetFieldCount (ushort value)
+    {
+        FieldCount = (byte)value;
+        Alignment = (byte)((Alignment & ~0x80) | ((value & 0x100) >> 1));
+    }
+
+    public byte GetAlignment () => (byte)(Alignment & 0x7F);
+    public void SetAlignment (byte value) => Alignment = (byte)((Alignment & ~0x7F) | value);
+
+    public bool IsSharedTypeDescriptorKey () => (FieldIndex & 0x80000000) != 0;
+
+    public Guid ToKey ()
     {
         byte[] key = new byte[16];
 

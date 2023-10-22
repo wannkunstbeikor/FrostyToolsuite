@@ -8,7 +8,7 @@ internal class EnumInfoData : TypeInfoData
 {
     private List<FieldInfo> m_fieldInfos = new();
 
-    public override void Read(MemoryReader reader)
+    public override void Read (MemoryReader reader)
     {
         base.Read(reader);
 
@@ -27,7 +27,7 @@ internal class EnumInfoData : TypeInfoData
         }
     }
 
-    public override void CreateType(StringBuilder sb)
+    public override void CreateType (StringBuilder sb)
     {
         base.CreateType(sb);
 

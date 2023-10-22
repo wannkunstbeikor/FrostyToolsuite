@@ -19,11 +19,11 @@ public partial class MainWindowViewModel : ObservableObject, IDropTarget
     private readonly IFactory m_factory = new DockFactory();
 
     private readonly FileViewModel m_defaultPage = new DefaultPageViewModel { Title = "Home" };
-    
+
     [ObservableProperty]
     private IRootDock? m_layout;
 
-    public MainWindowViewModel()
+    public MainWindowViewModel ()
     {
         // Setup Docking
         Layout = m_factory.CreateLayout();
@@ -33,10 +33,9 @@ public partial class MainWindowViewModel : ObservableObject, IDropTarget
         }
     }
 
-    public static async Task<bool> SetupFrostySdk(string inProfileKey, string inProfilePath)
+    public static async Task<bool> SetupFrostySdk (string inProfileKey, string inProfilePath)
     {
-        return await Task.Run(() =>
-        {
+        return await Task.Run(() => {
             if (!ProfilesLibrary.Initialize(inProfileKey))
             {
                 return false;
@@ -54,7 +53,7 @@ public partial class MainWindowViewModel : ObservableObject, IDropTarget
                         {
                             return false;
                         }
-                        
+
                         byte[] initFsKey = new byte[0x10];
                         stream.ReadExactly(initFsKey);
                         KeyManager.AddKey("InitFsKey", initFsKey);
@@ -66,7 +65,7 @@ public partial class MainWindowViewModel : ObservableObject, IDropTarget
                     }
                 }
             }
-                
+
             // init filesystem manager, this parses the layout.toc file
             if (!FileSystemManager.Initialize(inProfilePath))
             {
@@ -106,13 +105,13 @@ public partial class MainWindowViewModel : ObservableObject, IDropTarget
             // {
             //     return false;
             // }
-            
+
             // init resource manager, this parses the cas.cat files if they exist for easy asset lookup
             if (!ResourceManager.Initialize())
             {
                 return false;
             }
-            
+
             // init asset manager, this parses the SuperBundles and loads all the assets
             if (!AssetManager.Initialize())
             {
@@ -123,7 +122,7 @@ public partial class MainWindowViewModel : ObservableObject, IDropTarget
         });
     }
 
-    private void AddFileViewModel(FileViewModel fileViewModel)
+    private void AddFileViewModel (FileViewModel fileViewModel)
     {
         IDocumentDock? files = m_factory.GetDockable<IDocumentDock>("Files");
         if (Layout is not null && files is not null)
@@ -134,15 +133,15 @@ public partial class MainWindowViewModel : ObservableObject, IDropTarget
         }
     }
 
-    private FileViewModel? GetActiveFileViewModel()
+    private FileViewModel? GetActiveFileViewModel ()
     {
         IDocumentDock? files = m_factory.GetDockable<IDocumentDock>("Files");
         return files?.ActiveDockable as FileViewModel;
     }
 
-    private FileViewModel GetDefaultPageViewModel() => m_defaultPage;
+    private FileViewModel GetDefaultPageViewModel () => m_defaultPage;
 
-    public void CloseLayout()
+    public void CloseLayout ()
     {
         if (Layout is IDock dock)
         {
@@ -153,16 +152,16 @@ public partial class MainWindowViewModel : ObservableObject, IDropTarget
         }
     }
 
-    public void DragOver(object? sender, DragEventArgs e)
+    public void DragOver (object? sender, DragEventArgs e)
     {
         if (!e.Data.Contains(DataFormats.Files))
         {
-            e.DragEffects = DragDropEffects.None; 
+            e.DragEffects = DragDropEffects.None;
             e.Handled = true;
         }
     }
 
-    public void Drop(object? sender, DragEventArgs e)
+    public void Drop (object? sender, DragEventArgs e)
     {
         if (e.Data.Contains(DataFormats.Files))
         {
@@ -177,6 +176,7 @@ public partial class MainWindowViewModel : ObservableObject, IDropTarget
                     }
                 }
             }
+
             e.Handled = true;
         }
     }

@@ -14,7 +14,7 @@ namespace Frosty.Sdk.Managers.Loaders;
 
 public class DbObjectAssetLoader : IAssetLoader
 {
-    public void Load()
+    public void Load ()
     {
         foreach (SuperBundleInfo sbInfo in FileSystemManager.EnumerateSuperBundles())
         {
@@ -29,6 +29,7 @@ public class DbObjectAssetLoader : IAssetLoader
                     continue;
                 }
             }
+
             DbObjectDict? toc = DbObject.Deserialize(tocPath)?.AsDict();
             if (toc is null)
             {
@@ -44,12 +45,13 @@ public class DbObjectAssetLoader : IAssetLoader
             {
                 continue;
             }
-            
+
             LoadSb(bundles, baseBundleDic, superBundleId);
         }
     }
 
-    private bool LoadToc(string sbName, int superBundleId, DbObjectDict toc, ref List<BundleInfo> bundles, ref Dictionary<int, BundleInfo> baseBundleDic, bool isPatched)
+    private bool LoadToc (string sbName, int superBundleId, DbObjectDict toc, ref List<BundleInfo> bundles,
+        ref Dictionary<int, BundleInfo> baseBundleDic, bool isPatched)
     {
         // flag for if the assets are stored in cas files or in the superbundle directly
         bool isCas = toc.AsBoolean("cas");
@@ -64,7 +66,7 @@ public class DbObjectAssetLoader : IAssetLoader
             foreach (DbObject chunkObj in toc.AsList("chunks"))
             {
                 DbObjectDict chunk = chunkObj.AsDict();
-                
+
                 long size = isCas ? ResourceManager.GetSize(chunk.AsSha1("sha1")) : chunk.AsLong("size");
 
                 ChunkAssetEntry entry = new(chunk.AsGuid("id"), chunk.AsSha1("sha1", Sha1.Zero), size, 0, 0,
@@ -79,10 +81,10 @@ public class DbObjectAssetLoader : IAssetLoader
                     IEnumerable<IFileInfo>? fileInfos = ResourceManager.GetFileInfos(entry.Sha1);
                     if (fileInfos is not null)
                     {
-                        entry.FileInfos.UnionWith(fileInfos);   
+                        entry.FileInfos.UnionWith(fileInfos);
                     }
                 }
-                
+
                 AssetManager.AddSuperBundleChunk(entry);
             }
         }
@@ -107,8 +109,7 @@ public class DbObjectAssetLoader : IAssetLoader
                     int offset = dasBundleOffsets[bundleIter].AsInt();
                     int size = dasBundleSizes[bundleIter].AsInt();
 
-                    bundles.Add(new BundleInfo()
-                    {
+                    bundles.Add(new BundleInfo() {
                         Name = name,
                         SbName = sbName,
                         Offset = offset,
@@ -133,8 +134,7 @@ public class DbObjectAssetLoader : IAssetLoader
                     long offset = bundleInfoDict.AsLong("offset");
                     long size = bundleInfoDict.AsLong("size");
 
-                    bundles.Add(new BundleInfo()
-                    {
+                    bundles.Add(new BundleInfo() {
                         Name = name,
                         SbName = sbName,
                         Offset = offset,
@@ -162,21 +162,20 @@ public class DbObjectAssetLoader : IAssetLoader
             }
 
             isCas = baseToc.AsBoolean("cas");
-                
+
             if (!baseToc.ContainsKey("bundles"))
             {
                 return false;
             }
-                
+
             foreach (DbObject bundleInfo in baseToc.AsList("bundles"))
             {
                 string name = bundleInfo.AsDict().AsString("id");
-                    
+
                 long offset = bundleInfo.AsDict().AsLong("offset");
                 long size = bundleInfo.AsDict().AsLong("size");
-                
-                baseBundleDic.Add(Utils.Utils.HashString(name, true), new BundleInfo()
-                {
+
+                baseBundleDic.Add(Utils.Utils.HashString(name, true), new BundleInfo() {
                     Name = name,
                     SbName = sbName,
                     Offset = offset,
@@ -186,11 +185,11 @@ public class DbObjectAssetLoader : IAssetLoader
                 });
             }
         }
-        
+
         return true;
     }
 
-    private void LoadSb(List<BundleInfo> bundles, Dictionary<int, BundleInfo> baseBundleDic, int superBundleId)
+    private void LoadSb (List<BundleInfo> bundles, Dictionary<int, BundleInfo> baseBundleDic, int superBundleId)
     {
         string patchSbPath = string.Empty;
         string baseSbPath = string.Empty;
@@ -210,6 +209,7 @@ public class DbObjectAssetLoader : IAssetLoader
                     patchStream = BlockStream.FromFile(
                         FileSystemManager.ResolvePath(true, $"{patchSbPath}.sb"), false);
                 }
+
                 stream = patchStream;
             }
             else
@@ -221,9 +221,10 @@ public class DbObjectAssetLoader : IAssetLoader
                     baseStream = BlockStream.FromFile(
                         FileSystemManager.ResolvePath(false, $"{baseSbPath}.sb"), false);
                 }
+
                 stream = baseStream;
             }
-            
+
             int bundleId = AssetManager.AddBundle(bundleInfo.Name, superBundleId);
 
             // load bundle from sb file
@@ -242,6 +243,7 @@ public class DbObjectAssetLoader : IAssetLoader
                             baseStream = BlockStream.FromFile(
                                 FileSystemManager.ResolvePath(false, $"{baseSbPath}.sb"), false);
                         }
+
                         baseStream!.Position = baseBundleInfo.Offset;
                     }
 
@@ -413,12 +415,12 @@ public class DbObjectAssetLoader : IAssetLoader
                 }
             }
         }
-        
+
         patchStream?.Dispose();
         baseStream?.Dispose();
     }
 
-    private BinaryBundle DeserializeDeltaBundle(DataStream? baseStream, DataStream deltaStream)
+    private BinaryBundle DeserializeDeltaBundle (DataStream? baseStream, DataStream deltaStream)
     {
         ulong magic = deltaStream.ReadUInt64();
         if (magic != 0x0000000001000000)
@@ -428,17 +430,17 @@ public class DbObjectAssetLoader : IAssetLoader
 
         uint bundleSize = deltaStream.ReadUInt32(Endian.Big);
         deltaStream.ReadUInt32(Endian.Big); // size of data after binary bundle
-            
+
         long startOffset = deltaStream.Position;
 
         int patchedBundleSize = deltaStream.ReadInt32(Endian.Big);
         uint baseBundleSize = baseStream?.ReadUInt32(Endian.Big) ?? 0;
         long baseBundleOffset = baseStream?.Position ?? -1;
-        
+
         using (BlockStream stream = new(patchedBundleSize + 4))
         {
             stream.WriteInt32(patchedBundleSize, Endian.Big);
-            
+
             while (deltaStream.Position < bundleSize + startOffset)
             {
                 uint packed = deltaStream.ReadUInt32(Endian.Big);
@@ -466,13 +468,13 @@ public class DbObjectAssetLoader : IAssetLoader
             {
                 baseStream.Position = baseBundleOffset + baseBundleSize;
             }
-            
+
             stream.Position = 0;
             return BinaryBundle.Deserialize(stream);
         }
     }
 
-    public static long GetSize(DataStream stream, long originalSize)
+    public static long GetSize (DataStream stream, long originalSize)
     {
         long size = 0;
         while (originalSize > 0)
@@ -482,8 +484,8 @@ public class DbObjectAssetLoader : IAssetLoader
 
         return size;
     }
-    
-    private static void ReadBlock(DataStream stream, ref long originalSize, ref long size)
+
+    private static void ReadBlock (DataStream stream, ref long originalSize, ref long size)
     {
         ulong packed = stream.ReadUInt64(Endian.Big);
 

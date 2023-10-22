@@ -7,7 +7,7 @@
              x:Class="FrostyEditor.Views.Documents.DefaultPageView"
              x:DataType="vm:DefaultPageViewModel"
              x:CompileBindings="True">
-    <Grid Focusable="True">
-        <TextBlock Text="Welcome"/>
-    </Grid>
+  <Grid Focusable="True">
+    <TextBlock Text="Welcome" />
+  </Grid>
 </UserControl>

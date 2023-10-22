@@ -7,8 +7,8 @@ namespace Frosty.Sdk.Attributes;
 public class EbxArrayMetaAttribute : Attribute
 {
     public TypeFlags Flags { get; set; }
-    
-    public EbxArrayMetaAttribute(ushort flags)
+
+    public EbxArrayMetaAttribute (ushort flags)
     {
         Flags = flags;
     }

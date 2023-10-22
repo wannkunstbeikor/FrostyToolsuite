@@ -13,13 +13,13 @@ public class InstallChunkInfo
     public readonly HashSet<string> SuperBundles = new();
     public readonly HashSet<string> SplitSuperBundles = new();
 
-    public bool RequiresInstallChunk(InstallChunkInfo b)
+    public bool RequiresInstallChunk (InstallChunkInfo b)
     {
         if (RequiredCatalogs.Count == 0)
         {
             return false;
         }
-        
+
         if (RequiredCatalogs.Contains(b.Id))
         {
             return true;

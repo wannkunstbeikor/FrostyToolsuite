@@ -9,7 +9,8 @@ namespace Frosty.Sdk.Attributes;
 public class CategoryAttribute : Attribute
 {
     public string Name { get; set; }
-    public CategoryAttribute(string name)
+
+    public CategoryAttribute (string name)
     {
         Name = name;
     }

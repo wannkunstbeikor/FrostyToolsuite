@@ -29,7 +29,7 @@ public static class Config
         /// <param name="option">The option key to locate in the <see cref="Config"/>.</param>
         /// <param name="scope"></param>
         /// <param name="profile"></param>
-        public bool Contains(string option, ConfigScope scope = ConfigScope.Global, string? profile = null)
+        public bool Contains (string option, ConfigScope scope = ConfigScope.Global, string? profile = null)
         {
             if (scope == ConfigScope.Global)
             {
@@ -43,25 +43,24 @@ public static class Config
 
             return false;
         }
-        
+
         // indexer
-        public object? this[string option, ConfigScope scope = ConfigScope.Global, string? profile = null]
+        public object? this [string option, ConfigScope scope = ConfigScope.Global, string? profile = null]
         {
-            get
-            {
+            get {
                 if (scope == ConfigScope.Game || scope == ConfigScope.Pack)
                 {
                     if (Games.TryGetValue(profile ?? ProfilesLibrary.ProfileName, out GameOptions? game))
                     {
                         return game[option, scope];
                     }
+
                     return null;
                 }
 
                 return GlobalOptions.TryGetValue(option, out object? globalOption) ? globalOption : null;
             }
-            set
-            {
+            set {
                 if (scope == ConfigScope.Game || scope == ConfigScope.Pack)
                 {
                     if (Games.TryGetValue(profile ?? ProfilesLibrary.ProfileName, out GameOptions? game))
@@ -76,7 +75,7 @@ public static class Config
             }
         }
 
-        public bool TryGetValue(string option, ConfigScope scope, string profileName, out object? value)
+        public bool TryGetValue (string option, ConfigScope scope, string profileName, out object? value)
         {
             if (!Contains(option, scope, profileName))
             {
@@ -100,16 +99,18 @@ public static class Config
         public Dictionary<string, object> Options { get; set; } = new();
         public Dictionary<string, string> Packs { get; set; } = new();
 
-        public GameOptions(string gamePath)
+        public GameOptions (string gamePath)
         {
             GamePath = gamePath;
         }
 
-        internal bool Contains(string option, ConfigScope scope = ConfigScope.Game) => scope == ConfigScope.Game ? Options.ContainsKey(option) || option == "GamePath" || option == "BookmarkDb" : Packs.ContainsKey(option);
+        internal bool Contains (string option, ConfigScope scope = ConfigScope.Game) => scope == ConfigScope.Game
+            ? Options.ContainsKey(option) || option == "GamePath" || option == "BookmarkDb"
+            : Packs.ContainsKey(option);
 
-        internal void Add(string option, object value) => this[option] = value;
+        internal void Add (string option, object value) => this[option] = value;
 
-        internal void Remove(string option, ConfigScope scope = ConfigScope.Game)
+        internal void Remove (string option, ConfigScope scope = ConfigScope.Game)
         {
             if (scope == ConfigScope.Game)
             {
@@ -121,7 +122,7 @@ public static class Config
             }
         }
 
-        internal void Rename(string option, string newoption, ConfigScope scope = ConfigScope.Game)
+        internal void Rename (string option, string newoption, ConfigScope scope = ConfigScope.Game)
         {
             if (scope == ConfigScope.Pack && Packs.TryGetValue(option, out string? value))
             {
@@ -130,7 +131,7 @@ public static class Config
             }
         }
 
-        internal IEnumerable<string> EnumerateKeys(ConfigScope scope = ConfigScope.Game)
+        internal IEnumerable<string> EnumerateKeys (ConfigScope scope = ConfigScope.Game)
         {
             if (scope == ConfigScope.Game)
             {
@@ -149,10 +150,9 @@ public static class Config
         }
 
         // indexer
-        public object? this[string option, ConfigScope scope = ConfigScope.Game]
+        public object? this [string option, ConfigScope scope = ConfigScope.Game]
         {
-            get
-            {
+            get {
                 if (scope == ConfigScope.Pack)
                 {
                     return Packs.TryGetValue(option, out string? pack) ? pack : null;
@@ -170,8 +170,7 @@ public static class Config
 
                 return Options.TryGetValue(option, out object? value) ? value : null;
             }
-            set
-            {
+            set {
                 if (scope == ConfigScope.Pack)
                 {
                     Packs[option] = (string?)value ?? string.Empty;
@@ -199,8 +198,7 @@ public static class Config
 
     public static IEnumerable<string> GameProfiles
     {
-        get
-        {
+        get {
             s_current ??= new InternalConfig();
             return s_current.Games.Keys.ToList();
         }
@@ -211,10 +209,10 @@ public static class Config
     /// </summary>
     /// <param name="profile">The profile name.</param>
     /// <param name="gamePath">The path to the game.</param>
-    public static void AddGame(string profile, string gamePath)
+    public static void AddGame (string profile, string gamePath)
     {
         s_current ??= new InternalConfig();
-        
+
         if (!s_current.Games.ContainsKey(profile))
         {
             s_current.Games.Add(profile, new GameOptions(gamePath));
@@ -225,10 +223,10 @@ public static class Config
     /// Removes a <see cref="GameOptions"/> from the active <see cref="Config"/>.
     /// </summary>
     /// <param name="profile">The profile name.</param>
-    public static void RemoveGame(string profile)
+    public static void RemoveGame (string profile)
     {
         s_current ??= new InternalConfig();
-        
+
         s_current.Games.Remove(profile);
     }
 
@@ -239,10 +237,10 @@ public static class Config
     /// <param name="value">The value of the option to store.</param>
     /// <param name="scope">The <see cref="ConfigScope"/> of the option.</param>
     /// <param name="profile">The profile the option belongs to. If null, the currently active profile will be used.</param>
-    public static void Add(string option, object value, ConfigScope scope = ConfigScope.Global, string? profile = null)
+    public static void Add (string option, object value, ConfigScope scope = ConfigScope.Global, string? profile = null)
     {
         s_current ??= new InternalConfig();
-        
+
         s_current[option, scope, profile] = value;
     }
 
@@ -252,10 +250,10 @@ public static class Config
     /// <param name="option">The key of the option to remove.</param>
     /// <param name="scope">The <see cref="ConfigScope"/> of the option.</param>
     /// <param name="profile">The profile the option belongs to. If null, the currently active profile will be used.</param>
-    public static void Remove(string option, ConfigScope scope = ConfigScope.Global, string? profile = null)
+    public static void Remove (string option, ConfigScope scope = ConfigScope.Global, string? profile = null)
     {
         s_current ??= new InternalConfig();
-        
+
         if (scope == ConfigScope.Game || scope == ConfigScope.Pack)
         {
             if (s_current.Games.TryGetValue(profile ?? ProfilesLibrary.ProfileName, out GameOptions? gameOptions))
@@ -269,7 +267,8 @@ public static class Config
         }
     }
 
-    public static void Rename(string option, string newOption, ConfigScope scope = ConfigScope.Global, string? profile = null)
+    public static void Rename (string option, string newOption, ConfigScope scope = ConfigScope.Global,
+        string? profile = null)
     {
         s_current ??= new InternalConfig();
 
@@ -287,7 +286,7 @@ public static class Config
         }
     }
 
-    public static IEnumerable<string> EnumerateKeys(ConfigScope scope = ConfigScope.Global, string? profile = null)
+    public static IEnumerable<string> EnumerateKeys (ConfigScope scope = ConfigScope.Global, string? profile = null)
     {
         s_current ??= new InternalConfig();
         if (scope == ConfigScope.Global)
@@ -297,7 +296,7 @@ public static class Config
 
         if (s_current.Games.TryGetValue(profile ?? ProfilesLibrary.ProfileName, out GameOptions? gameOptions))
         {
-            return gameOptions.EnumerateKeys(scope);   
+            return gameOptions.EnumerateKeys(scope);
         }
 
         return Enumerable.Empty<string>();
@@ -310,12 +309,14 @@ public static class Config
     /// <param name="defaultValue">The default value of the option, if not found in the <see cref="Config"/>.</param>
     /// <param name="scope">The <see cref="ConfigScope"/> of the option.</param>
     /// <param name="profile">The profile the option belongs to. If null, the currently active profile will be used.</param>
-    
-    public static T Get<T>(string option, T defaultValue, ConfigScope scope = ConfigScope.Global, string? profile = null)
+    public static T Get<T> (string option, T defaultValue, ConfigScope scope = ConfigScope.Global,
+        string? profile = null)
     {
         s_current ??= new InternalConfig();
-        
-        return s_current.TryGetValue(option, scope, profile ?? ProfilesLibrary.ProfileName, out object? value) ? (T?)Convert.ChangeType(value, typeof(T)) ?? defaultValue : defaultValue;
+
+        return s_current.TryGetValue(option, scope, profile ?? ProfilesLibrary.ProfileName, out object? value)
+            ? (T?)Convert.ChangeType(value, typeof(T)) ?? defaultValue
+            : defaultValue;
     }
 
 
@@ -547,10 +548,10 @@ public static class Config
     /// Serializes the configurable options to a json file.
     /// </summary>
     /// <param name="path">The output path of the configuration file.</param>
-    public static void Save(string path)
+    public static void Save (string path)
     {
         s_current ??= new InternalConfig();
-        
+
         FileInfo fileInfo = new(path);
 
         if (fileInfo.DirectoryName is not null)
@@ -560,10 +561,7 @@ public static class Config
 
         using (FileStream stream = new(fileInfo.FullName, FileMode.Create, FileAccess.Write))
         {
-            JsonSerializer.Serialize(stream, s_current, new JsonSerializerOptions
-            {
-                WriteIndented = true
-            });
+            JsonSerializer.Serialize(stream, s_current, new JsonSerializerOptions { WriteIndented = true });
         }
     }
 
@@ -571,10 +569,10 @@ public static class Config
     /// Deserializes the configurable options from a json file into a <see cref="Config"/> object.
     /// </summary>
     /// <param name="path">The input path of the configuration file.</param>
-    public static void Load(string path)
+    public static void Load (string path)
     {
         FileInfo fileInfo = new(path);
-        
+
         if (fileInfo.Exists)
         {
             using (FileStream stream = new(fileInfo.FullName, FileMode.Open, FileAccess.Read))
@@ -582,7 +580,7 @@ public static class Config
                 s_current = JsonSerializer.Deserialize<InternalConfig>(stream);
             }
         }
-        
+
         s_current ??= new InternalConfig();
     }
 }

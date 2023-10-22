@@ -16,42 +16,43 @@ internal class HuffManConstructionNode : HuffmanNode, IComparable<HuffManConstru
 
     public new HuffManConstructionNode? Right { get; private set; }
 
-    public HuffManConstructionNode()
+    public HuffManConstructionNode ()
     {
         Occurrences = 0;
     }
 
-    public HuffManConstructionNode(char inValueChar, int inOccurrences)
+    public HuffManConstructionNode (char inValueChar, int inOccurrences)
     {
         Value = ~(uint)inValueChar;
         Occurrences = inOccurrences;
     }
 
-    public void SetLeftNode(HuffManConstructionNode leftNode)
+    public void SetLeftNode (HuffManConstructionNode leftNode)
     {
         base.SetLeftNode(leftNode);
         Left = leftNode;
         Occurrences += leftNode.Occurrences;
     }
 
-    public void SetRightNode(HuffManConstructionNode rightNode)
+    public void SetRightNode (HuffManConstructionNode rightNode)
     {
         base.SetRightNode(rightNode);
         Right = rightNode;
         Occurrences += rightNode.Occurrences;
     }
 
-    public int CompareTo(HuffManConstructionNode? other)
+    public int CompareTo (HuffManConstructionNode? other)
     {
         int cmp = Occurrences.CompareTo(other?.Occurrences);
         if (cmp == 0)
         {
             cmp = GetRemainingDepth().CompareTo(other?.GetRemainingDepth());
         }
+
         return cmp;
     }
 
-    private int GetRemainingDepth()
+    private int GetRemainingDepth ()
     {
         int ld = Left?.GetRemainingDepth() ?? 0;
         int rd = Right?.GetRemainingDepth() ?? 0;
@@ -79,7 +80,7 @@ public class IdentifierPositionTuple<T>
     /// </summary>
     public int Position { get; private set; }
 
-    public IdentifierPositionTuple(T inIdentifier, int inPosition)
+    public IdentifierPositionTuple (T inIdentifier, int inPosition)
     {
         Identifier = inIdentifier;
         Position = inPosition;
@@ -102,12 +103,11 @@ public class HuffmanEncodedTextArray<T>
     /// </summary>
     public byte[] EncodedTexts { get; private set; }
 
-    public HuffmanEncodedTextArray(IList<IdentifierPositionTuple<T>> inEncodedTextPositions, byte[] inEncodedTexts)
+    public HuffmanEncodedTextArray (IList<IdentifierPositionTuple<T>> inEncodedTextPositions, byte[] inEncodedTexts)
     {
         EncodedTextPositions = inEncodedTextPositions;
         EncodedTexts = inEncodedTexts;
     }
-
 }
 
 #endregion
@@ -123,7 +123,7 @@ public class HuffmanEncoder
     /// </summary>
     /// <param name="texts">The texts to encode, or a suitable approximation of the characters appearances.</param>
     /// <returns>The list of huffman node values in the order they should be written.</returns>
-    public IList<uint> BuildHuffmanEncodingTree(IEnumerable<string> texts)
+    public IList<uint> BuildHuffmanEncodingTree (IEnumerable<string> texts)
     {
         IList<string> strings = texts.ToList();
         HuffManConstructionNode rootNode = CalculateHuffmanEncoding(strings);
@@ -142,7 +142,7 @@ public class HuffmanEncoder
     /// <returns>the bool representation of the encoded text.</returns>
     /// <exception cref="System.Collections.Generic.KeyNotFoundException">If a character or symbol to encode was not found in the dictionary</exception>
     /// <exception cref="System.InvalidOperationException">If no encoding has been created yet.</exception>
-    public IList<bool> EncodeText(string text, bool includeEndDelimeter = true)
+    public IList<bool> EncodeText (string text, bool includeEndDelimeter = true)
     {
         CheckEncodingExists();
         return GetEncodedText(text, m_characterEncoding!, includeEndDelimeter);
@@ -157,7 +157,8 @@ public class HuffmanEncoder
     /// <returns>An instance of <see cref="HuffmanEncodedTextArray{T}"/> with the byte array of the encoded texts, and a list of the given text identifiers and their bit position inside the byte array. The list has the same ordering as the given input to this method. </returns>
     /// <exception cref="System.Collections.Generic.KeyNotFoundException">If a character or symbol to encode was not found in the dictionary</exception>
     /// <exception cref="System.InvalidOperationException">If no encoding has been created yet.</exception>
-    public HuffmanEncodedTextArray<T> EncodeTexts<T>(IEnumerable<Tuple<T, string>> textsPerIdentifier, bool compressResults = false)
+    public HuffmanEncodedTextArray<T> EncodeTexts<T> (IEnumerable<Tuple<T, string>> textsPerIdentifier,
+        bool compressResults = false)
     {
         CheckEncodingExists();
 
@@ -168,7 +169,6 @@ public class HuffmanEncoder
 
         foreach (var textWithIdentifier in textsPerIdentifier)
         {
-
             T textIdentifier = textWithIdentifier.Item1;
             string text = textWithIdentifier.Item2;
             int position = encodedTextBools.Count;
@@ -208,7 +208,7 @@ public class HuffmanEncoder
     /// <summary>
     /// Resets instance variables.
     /// </summary>
-    public void Dispose()
+    public void Dispose ()
     {
         m_characterEncoding = null;
     }
@@ -218,7 +218,7 @@ public class HuffmanEncoder
     /// </summary>
     /// <param name="texts"></param>
     /// <returns>Huffman root node.</returns>
-    private static HuffManConstructionNode CalculateHuffmanEncoding(IList<string> texts)
+    private static HuffManConstructionNode CalculateHuffmanEncoding (IList<string> texts)
     {
         // get set of chars and their number of occurrences...
         Dictionary<char, int> charNumbers = new();
@@ -250,7 +250,6 @@ public class HuffmanEncoder
         uint nodeValue = 0;
         while (nodeList.Count > 1)
         {
-
             nodeList.Sort();
 
             HuffManConstructionNode left = nodeList[0];
@@ -258,10 +257,7 @@ public class HuffmanEncoder
 
             nodeList.RemoveRange(0, 2);
 
-            HuffManConstructionNode composite = new()
-            {
-                Value = nodeValue++,
-            };
+            HuffManConstructionNode composite = new() { Value = nodeValue++, };
             composite.SetLeftNode(left);
             composite.SetRightNode(right);
 
@@ -276,9 +272,8 @@ public class HuffmanEncoder
     /// </summary>
     /// <param name="encodingNodes">The (limited) list of Huffman code nodes used.</param>
     /// <returns>Dictionary of char - code values</returns>
-    private static IDictionary<char, IList<bool>> GetCharEncoding(IList<HuffmanNode> encodingNodes)
+    private static IDictionary<char, IList<bool>> GetCharEncoding (IList<HuffmanNode> encodingNodes)
     {
-
         Dictionary<char, IList<bool>> charEncodings = new();
 
         foreach (HuffmanNode node in encodingNodes)
@@ -291,6 +286,7 @@ public class HuffmanEncoder
                 charEncodings.Add(c, path);
             }
         }
+
         return charEncodings;
     }
 
@@ -300,7 +296,7 @@ public class HuffmanEncoder
     /// </summary>
     /// <param name="rootNode">the root node of the tree to flatten into a single list.</param>
     /// <returns>list of nodes in the order to write</returns>
-    private static IList<HuffmanNode> GetNodeListToWrite(HuffmanNode? rootNode)
+    private static IList<HuffmanNode> GetNodeListToWrite (HuffmanNode? rootNode)
     {
         List<HuffmanNode> nodesSansRoot = new();
 
@@ -325,7 +321,7 @@ public class HuffmanEncoder
         return nodesSansRoot;
     }
 
-    private static List<HuffmanNode> GetAllBranchNodes(List<HuffmanNode> currentNodes)
+    private static List<HuffmanNode> GetAllBranchNodes (List<HuffmanNode> currentNodes)
     {
         List<HuffmanNode> branchNodes = new();
 
@@ -347,7 +343,7 @@ public class HuffmanEncoder
     /// </summary>
     /// <param name="node">The node for which to find the encoding.</param>
     /// <returns>the encoding as list of booleans.</returns>
-    private static IList<bool> GetCharEncodingRecursive(HuffmanNode node)
+    private static IList<bool> GetCharEncodingRecursive (HuffmanNode node)
     {
         HuffmanNode? parent = node.Parent;
         if (parent == null)
@@ -383,7 +379,8 @@ public class HuffmanEncoder
     /// <param name="includeEndDelimeter">Whether or not to include the end delimiter in the returned encoding.</param>
     /// <returns>The encoded text.</returns>
     /// <exception cref="System.Collections.Generic.KeyNotFoundException">If a character or symbol to encode was not found in the dictionary</exception>
-    private static IList<bool> GetEncodedText(IEnumerable<char> toEncode, IDictionary<char, IList<bool>> charEncoding, bool includeEndDelimeter)
+    private static IList<bool> GetEncodedText (IEnumerable<char> toEncode, IDictionary<char, IList<bool>> charEncoding,
+        bool includeEndDelimeter)
     {
         List<bool> encodedText = new();
 
@@ -401,9 +398,8 @@ public class HuffmanEncoder
         return encodedText;
     }
 
-    private static IList<bool> TryGetCharacterEncoding(char c, IDictionary<char, IList<bool>> charEncoding)
+    private static IList<bool> TryGetCharacterEncoding (char c, IDictionary<char, IList<bool>> charEncoding)
     {
-
         bool found = charEncoding.TryGetValue(c, out IList<bool>? encodedChar);
         if (found)
         {
@@ -423,12 +419,12 @@ public class HuffmanEncoder
     /// Asserts that an encoding has been created.
     /// </summary>
     /// <exception cref="InvalidOperationException">If no encoding exists.</exception>
-    private void CheckEncodingExists()
+    private void CheckEncodingExists ()
     {
         if (m_characterEncoding == null)
         {
-            throw new InvalidOperationException("Cannot encode texts before the Huffman tree was built! Call 'BuildHuffmanEncodingTree' on the encoder before attempting to encode a string!");
+            throw new InvalidOperationException(
+                "Cannot encode texts before the Huffman tree was built! Call 'BuildHuffmanEncodingTree' on the encoder before attempting to encode a string!");
         }
     }
-
 }

@@ -11,23 +11,23 @@ public class Resource
     protected byte[] m_resMeta;
     protected ulong m_resRid;
 
-    public Resource()
+    public Resource ()
     {
         m_resMeta = new byte[16];
         m_resRid = 0;
     }
 
-    public virtual void Set(ResAssetEntry entry)
+    public virtual void Set (ResAssetEntry entry)
     {
         m_resMeta = entry.ResMeta;
         m_resRid = entry.ResRid;
     }
-    
-    public virtual void Deserialize(DataStream stream)
+
+    public virtual void Deserialize (DataStream stream)
     {
     }
 
-    public virtual void Serialize(DataStream stream)
+    public virtual void Serialize (DataStream stream)
     {
     }
 }

@@ -7,13 +7,13 @@ public struct EbxImportReference
     public Guid FileGuid;
     public Guid ClassGuid;
 
-    public override string ToString() => FileGuid.ToString() + "/" + ClassGuid.ToString();
+    public override string ToString () => FileGuid.ToString() + "/" + ClassGuid.ToString();
 
-    public static bool operator ==(EbxImportReference a, EbxImportReference b) => a.Equals(b);
+    public static bool operator == (EbxImportReference a, EbxImportReference b) => a.Equals(b);
 
-    public static bool operator !=(EbxImportReference a, EbxImportReference b) => !a.Equals(b);
+    public static bool operator != (EbxImportReference a, EbxImportReference b) => !a.Equals(b);
 
-    public override bool Equals(object? obj)
+    public override bool Equals (object? obj)
     {
         if (obj is EbxImportReference b)
         {
@@ -23,7 +23,7 @@ public struct EbxImportReference
         return false;
     }
 
-    public override int GetHashCode()
+    public override int GetHashCode ()
     {
         unchecked
         {

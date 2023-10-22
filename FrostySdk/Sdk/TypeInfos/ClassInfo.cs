@@ -5,17 +5,17 @@ namespace Frosty.Sdk.Sdk.TypeInfos;
 
 internal class ClassInfo : TypeInfo
 {
-    public ClassInfo GetSuperClassInfo() => (TypeInfo.TypeInfoMapping[p_superClass] as ClassInfo)!;
+    public ClassInfo GetSuperClassInfo () => (TypeInfo.TypeInfoMapping[p_superClass] as ClassInfo)!;
 
     private long p_superClass;
     private long p_defaultInstance;
 
-    public ClassInfo(ClassInfoData data)
+    public ClassInfo (ClassInfoData data)
         : base(data)
     {
     }
 
-    public override void Read(MemoryReader reader)
+    public override void Read (MemoryReader reader)
     {
         base.Read(reader);
 
@@ -23,7 +23,7 @@ internal class ClassInfo : TypeInfo
         p_defaultInstance = reader.ReadLong();
     }
 
-    public int GetFieldCount()
+    public int GetFieldCount ()
     {
         int fieldCount = (m_data as ClassInfoData)?.GetFieldCount() ?? 0;
         ClassInfo superClass = GetSuperClassInfo();
@@ -31,6 +31,7 @@ internal class ClassInfo : TypeInfo
         {
             fieldCount += superClass.GetFieldCount();
         }
+
         return fieldCount;
     }
 }

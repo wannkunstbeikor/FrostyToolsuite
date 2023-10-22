@@ -13,77 +13,84 @@ namespace FrostyTypeSdkGenerator;
 public sealed partial class SourceGenerator : IIncrementalGenerator
 {
     private static readonly MetaCollector s_metaCollector = new();
-    
-    public void Initialize(IncrementalGeneratorInitializationContext context)
+
+    public void Initialize (IncrementalGeneratorInitializationContext context)
     {
         // Equals and GetHashCode overrides for structs
         {
-            IncrementalValuesProvider<TypeContext> syntaxProvider = context.SyntaxProvider.CreateSyntaxProvider(StructPredicate, TypeTransform)
+            IncrementalValuesProvider<TypeContext> syntaxProvider = context.SyntaxProvider
+                .CreateSyntaxProvider(StructPredicate, TypeTransform)
                 .Where(static type => type is not null)
                 .Select(static (type, _) => TransformType(type!)).WithComparer(TypeContextEqualityComparer.Instance);
-        
+
             context.RegisterSourceOutput(syntaxProvider, CreateStructOverrides);
         }
-        
+
         // Equals override for empty structs
         {
-            IncrementalValuesProvider<TypeContext> syntaxProvider = context.SyntaxProvider.CreateSyntaxProvider(EmptyStructPredicate, TypeTransform)
+            IncrementalValuesProvider<TypeContext> syntaxProvider = context.SyntaxProvider
+                .CreateSyntaxProvider(EmptyStructPredicate, TypeTransform)
                 .Where(static type => type is not null)
                 .Select(static (type, _) => TransformType(type!)).WithComparer(TypeContextEqualityComparer.Instance);
-        
+
             context.RegisterSourceOutput(syntaxProvider, CreateEmptyStructOverrides);
         }
 
         // InstanceGuid for base classes
         {
-            IncrementalValuesProvider<TypeContext> syntaxProvider = context.SyntaxProvider.CreateSyntaxProvider(BaseClassPredicate, TypeTransform)
+            IncrementalValuesProvider<TypeContext> syntaxProvider = context.SyntaxProvider
+                .CreateSyntaxProvider(BaseClassPredicate, TypeTransform)
                 .Where(static type => type is not null)
                 .Select(static (type, _) => TransformType(type!)).WithComparer(TypeContextEqualityComparer.Instance);
-            
+
             context.RegisterSourceOutput(syntaxProvider, CreateInstanceGuid);
         }
 
         // Id for DataContainer classes
         {
-            IncrementalValuesProvider<TypeContext> syntaxProvider = context.SyntaxProvider.CreateSyntaxProvider(DataContainerPredicate, TypeTransform)
+            IncrementalValuesProvider<TypeContext> syntaxProvider = context.SyntaxProvider
+                .CreateSyntaxProvider(DataContainerPredicate, TypeTransform)
                 .Where(static type => type is not null)
                 .Select(static (type, _) => TransformType(type!)).WithComparer(TypeContextEqualityComparer.Instance);
-            
+
             context.RegisterSourceOutput(syntaxProvider, CreateId);
         }
-        
+
         // Id for non DataContainer classes
         {
-            IncrementalValuesProvider<TypeContext> syntaxProvider = context.SyntaxProvider.CreateSyntaxProvider(NonDataContainerPredicate, TypeTransform)
+            IncrementalValuesProvider<TypeContext> syntaxProvider = context.SyntaxProvider
+                .CreateSyntaxProvider(NonDataContainerPredicate, TypeTransform)
                 .Where(static type => type is not null)
                 .Select(static (type, _) => TransformType(type!)).WithComparer(TypeContextEqualityComparer.Instance);
-            
+
             context.RegisterSourceOutput(syntaxProvider, CreateIdOverride);
         }
-        
+
         // Create Properties
         {
             s_metaCollector.Meta.Clear();
-            IncrementalValuesProvider<string> metaProvider = context.AdditionalTextsProvider.Where(static meta => meta.Path.EndsWith(".cs"))
+            IncrementalValuesProvider<string> metaProvider = context.AdditionalTextsProvider
+                .Where(static meta => meta.Path.EndsWith(".cs"))
                 .Select((meta, _) => meta.GetText(_)!.ToString());
             context.RegisterSourceOutput(metaProvider, CreateMeta);
-            
-            IncrementalValuesProvider<TypeContext> syntaxProvider = context.SyntaxProvider.CreateSyntaxProvider(TypePredicate, TypeTransform)
+
+            IncrementalValuesProvider<TypeContext> syntaxProvider = context.SyntaxProvider
+                .CreateSyntaxProvider(TypePredicate, TypeTransform)
                 .Where(static type => type is not null)
                 .Select(static (type, _) => TransformType(type!)).WithComparer(TypeContextEqualityComparer.Instance);
-            
+
             context.RegisterSourceOutput(syntaxProvider, CreateProperties);
         }
     }
-    
-    private static INamedTypeSymbol? TypeTransform(GeneratorSyntaxContext syntaxContext,
+
+    private static INamedTypeSymbol? TypeTransform (GeneratorSyntaxContext syntaxContext,
         CancellationToken cancellationToken)
     {
         if (syntaxContext.Node is not TypeDeclarationSyntax candidate)
         {
             throw new Exception("Not a type");
         }
-        
+
         ISymbol? symbol = ModelExtensions.GetDeclaredSymbol(syntaxContext.SemanticModel, candidate, cancellationToken);
 
         if (symbol is INamedTypeSymbol typeSymbol)
@@ -94,7 +101,7 @@ public sealed partial class SourceGenerator : IIncrementalGenerator
         return null;
     }
 
-    private static TypeContext TransformType(INamedTypeSymbol type)
+    private static TypeContext TransformType (INamedTypeSymbol type)
     {
         string? @namespace = type.ContainingNamespace.IsGlobalNamespace
             ? null
@@ -109,7 +116,7 @@ public sealed partial class SourceGenerator : IIncrementalGenerator
         return new TypeContext(@namespace, name, isValueType, fields);
     }
 
-    private static FieldContext TransformField(ISymbol member)
+    private static FieldContext TransformField (ISymbol member)
     {
         if (member is not IFieldSymbol field)
         {
@@ -118,12 +125,13 @@ public sealed partial class SourceGenerator : IIncrementalGenerator
 
         string name = field.Name;
         string type = field.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-        ImmutableArray<string> attributes = field.GetAttributes().Select(static attr => attr.ToString()!).ToImmutableArray();
+        ImmutableArray<string> attributes =
+            field.GetAttributes().Select(static attr => attr.ToString()!).ToImmutableArray();
 
         return new FieldContext(name, type, attributes);
     }
 
-    private static void CreateStructOverrides(SourceProductionContext context, TypeContext structContext)
+    private static void CreateStructOverrides (SourceProductionContext context, TypeContext structContext)
     {
         string source = $@"// <auto-generated/>
 #nullable enable
@@ -163,11 +171,11 @@ public partial struct {structContext.Name}
         }}
     }}
 }}";
-        
+
         context.AddSource($"{GetQualifiedName(structContext)}.EqualOverride.g.cs", source);
     }
 
-    private static void CreateEmptyStructOverrides(SourceProductionContext context, TypeContext structContext)
+    private static void CreateEmptyStructOverrides (SourceProductionContext context, TypeContext structContext)
     {
         string source = $@"// <auto-generated/>
 #nullable enable
@@ -202,11 +210,11 @@ public partial struct {structContext.Name}
         }}
     }}
 }}";
-        
+
         context.AddSource($"{GetQualifiedName(structContext)}.EmptyEqualOverride.g.cs", source);
     }
-    
-    private static void CreateInstanceGuid(SourceProductionContext context, TypeContext classContext)
+
+    private static void CreateInstanceGuid (SourceProductionContext context, TypeContext classContext)
     {
         string source = $@"// <auto-generated/>
 #nullable enable
@@ -229,11 +237,11 @@ public partial class {classContext.Name}
 
     public void SetInstanceGuid(global::Frosty.Sdk.Ebx.AssetClassGuid newGuid) => __Guid = newGuid;
 }}";
-        
+
         context.AddSource($"{GetQualifiedName(classContext)}.InstanceGuid.g.cs", source);
     }
 
-    private static void CreateId(SourceProductionContext context, TypeContext classContext)
+    private static void CreateId (SourceProductionContext context, TypeContext classContext)
     {
         string source = $@"// <auto-generated/>
 #nullable enable
@@ -264,7 +272,8 @@ public partial class {classContext.Name}
         bool added = false;
         foreach (FieldContext field in classContext.Fields)
         {
-            if (classContext.Name != "Asset" && field.Name.Equals("_Name", StringComparison.OrdinalIgnoreCase) && field.Type.Equals("global::Frosty.Sdk.Ebx.CString"))
+            if (classContext.Name != "Asset" && field.Name.Equals("_Name", StringComparison.OrdinalIgnoreCase) &&
+                field.Type.Equals("global::Frosty.Sdk.Ebx.CString"))
             {
                 source = source.Remove(source.Length - 1) + @$"
     protected virtual global::Frosty.Sdk.Ebx.CString GetId()
@@ -318,11 +327,11 @@ public partial class {classContext.Name}
     }}
 }}";
         }
-        
+
         context.AddSource($"{GetQualifiedName(classContext)}.Id.g.cs", source);
     }
-    
-    private static void CreateIdOverride(SourceProductionContext context, TypeContext classContext)
+
+    private static void CreateIdOverride (SourceProductionContext context, TypeContext classContext)
     {
         FieldContext field = classContext.Fields.First(f => f.Name == "_Name");
 
@@ -330,7 +339,7 @@ public partial class {classContext.Name}
         {
             return;
         }
-        
+
         string source = $@"// <auto-generated/>
 #nullable enable
 using Frosty.Sdk.Attributes;
@@ -354,21 +363,22 @@ public partial class {classContext.Name}
         return base.GetId();
     }}
 }}";
-        
+
         context.AddSource($"{GetQualifiedName(classContext)}.OverrideId.g.cs", source);
     }
 
-    private static void CreateProperties(SourceProductionContext context, TypeContext typeContext)
+    private static void CreateProperties (SourceProductionContext context, TypeContext typeContext)
     {
         s_metaCollector.Meta.TryGetValue(typeContext.Name, out Dictionary<string, string>? meta);
-        
+
         string source = $@"// <auto-generated/>
 #nullable enable
 
 {(typeContext.Namespace is null ? string.Empty : $"namespace {typeContext.Namespace}; \n")}
 public partial {(typeContext.IsValueType ? "struct" : "class")} {typeContext.Name}
 {{";
-        bool needsConstructor = typeContext.Fields.Any(static f => f.Type.Contains("global::System.Collections.Generic.List<"));
+        bool needsConstructor =
+            typeContext.Fields.Any(static f => f.Type.Contains("global::System.Collections.Generic.List<"));
         string constructor = string.Empty;
         foreach (FieldContext field in typeContext.Fields)
         {
@@ -383,7 +393,7 @@ public partial {(typeContext.IsValueType ? "struct" : "class")} {typeContext.Nam
                     constructor += $"\n        {field.Name} = default;";
                 }
             }
-            
+
             string prop;
             if (meta is not null && meta.TryGetValue(field.Name.Remove(0, 1), out string? metaProp))
             {
@@ -402,7 +412,7 @@ public partial {(typeContext.IsValueType ? "struct" : "class")} {typeContext.Nam
         set => {field.Name} = value;
     }}";
             }
-            
+
             source += prop;
         }
 
@@ -418,39 +428,38 @@ public partial {(typeContext.IsValueType ? "struct" : "class")} {typeContext.Nam
 
         if (needsConstructor)
         {
-            
             source += $@"
 
     public {typeContext.Name}()
     {{{constructor}
     }}";
         }
-        
+
         source += "\n}";
-        
+
         context.AddSource($"{GetQualifiedName(typeContext)}.Properties.g.cs", source);
     }
 
-    private static void CreateMeta(SourceProductionContext context, string meta)
+    private static void CreateMeta (SourceProductionContext context, string meta)
     {
         SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(meta);
         CompilationUnitSyntax root = syntaxTree.GetCompilationUnitRoot();
         s_metaCollector.Visit(root);
     }
 
-    private static string GetQualifiedName(TypeContext context)
+    private static string GetQualifiedName (TypeContext context)
     {
         string hash = QuickHash(context.Name).ToString("x8");
         return context.Namespace is null
             ? $"{context.Name}.{hash}"
             : $"{context.Namespace}.{context.Name}.{hash}";
     }
-    
-    private static uint QuickHash(string value)
+
+    private static uint QuickHash (string value)
     {
         const uint kOffset = 5381;
         const uint kPrime = 33;
-        
+
         uint hash = kOffset;
         for (int i = 0; i < value.Length; i++)
         {

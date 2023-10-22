@@ -6,14 +6,14 @@ namespace FrostyEditor.Views;
 
 public partial class MainView : UserControl
 {
-    public MainView()
+    public MainView ()
     {
         InitializeComponent();
         AddHandler(DragDrop.DropEvent, DropHandler);
         AddHandler(DragDrop.DragOverEvent, DragOverHandler);
     }
 
-    private void DragOverHandler(object? sender, DragEventArgs e)
+    private void DragOverHandler (object? sender, DragEventArgs e)
     {
         if (DataContext is IDropTarget dropTarget)
         {
@@ -21,7 +21,7 @@ public partial class MainView : UserControl
         }
     }
 
-    private void DropHandler(object? sender, DragEventArgs e)
+    private void DropHandler (object? sender, DragEventArgs e)
     {
         if (DataContext is IDropTarget dropTarget)
         {

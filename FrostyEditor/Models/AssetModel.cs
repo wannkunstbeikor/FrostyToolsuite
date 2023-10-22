@@ -8,18 +8,17 @@ public class AssetModel
 {
     public string? Name => m_entry?.Filename;
     public string? Type => m_entry?.Type;
-    
+
     private readonly AssetEntry? m_entry;
 
-    public AssetModel(AssetEntry inEntry)
+    public AssetModel (AssetEntry inEntry)
     {
         m_entry = inEntry;
     }
-    
-    public static Comparison<AssetModel?> SortAscending<T>(Func<AssetModel, T> selector)
+
+    public static Comparison<AssetModel?> SortAscending<T> (Func<AssetModel, T> selector)
     {
-        return (x, y) =>
-        {
+        return (x, y) => {
             if (x is null && y is null)
                 return 0;
             if (x is null)
@@ -31,10 +30,9 @@ public class AssetModel
         };
     }
 
-    public static Comparison<AssetModel?> SortDescending<T>(Func<AssetModel, T> selector)
+    public static Comparison<AssetModel?> SortDescending<T> (Func<AssetModel, T> selector)
     {
-        return (x, y) =>
-        {
+        return (x, y) => {
             if (x is null && y is null)
                 return 0;
             if (x is null)

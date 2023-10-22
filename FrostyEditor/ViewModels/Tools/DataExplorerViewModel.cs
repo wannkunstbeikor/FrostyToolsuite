@@ -17,18 +17,19 @@ public partial class DataExplorerViewModel : Tool
 {
     public static IMultiValueConverter FolderIconConverter
     {
-        get
-        {
+        get {
             if (s_folderIconConverter is null)
             {
-                using (var folderCollapsedStream = AssetLoader.Open(new Uri("avares://FrostyEditor/Assets/FolderCollapsed.png")))
-                using (var folderExpandStream = AssetLoader.Open(new Uri("avares://FrostyEditor/Assets/FolderExpanded.png")))
-                {
-                    var folderCollapsedIcon = new Bitmap(folderCollapsedStream);
-                    var folderExpandIcon = new Bitmap(folderExpandStream);
+                using (var folderCollapsedStream =
+                       AssetLoader.Open(new Uri("avares://FrostyEditor/Assets/FolderCollapsed.png")))
+                    using (var folderExpandStream =
+                           AssetLoader.Open(new Uri("avares://FrostyEditor/Assets/FolderExpanded.png")))
+                    {
+                        var folderCollapsedIcon = new Bitmap(folderCollapsedStream);
+                        var folderExpandIcon = new Bitmap(folderExpandStream);
 
-                    s_folderIconConverter = new FolderIconConvert(folderExpandIcon, folderCollapsedIcon);
-                }
+                        s_folderIconConverter = new FolderIconConvert(folderExpandIcon, folderCollapsedIcon);
+                    }
             }
 
             return s_folderIconConverter;
@@ -45,20 +46,17 @@ public partial class DataExplorerViewModel : Tool
     [ObservableProperty]
     private FlatTreeDataGridSource<AssetModel> m_assetsSource;
 
-    public DataExplorerViewModel()
+    public DataExplorerViewModel ()
     {
-        FolderSource = new HierarchicalTreeDataGridSource<FolderTreeNodeModel>(FolderTreeNodeModel.Create())
-        {
-            Columns =
-            {
+        FolderSource = new HierarchicalTreeDataGridSource<FolderTreeNodeModel>(FolderTreeNodeModel.Create()) {
+            Columns = {
                 new HierarchicalExpanderColumn<FolderTreeNodeModel>(
                     new TemplateColumn<FolderTreeNodeModel>(
                         "Name",
                         "FolderNameCell",
                         null,
                         new GridLength(1, GridUnitType.Star),
-                        options: new()
-                        {
+                        options: new() {
                             CanUserResizeColumn = false,
                             CanUserSortColumn = false,
                             CompareAscending = FolderTreeNodeModel.SortAscending(x => x.Name),
@@ -72,17 +70,14 @@ public partial class DataExplorerViewModel : Tool
 
         FolderSource.RowSelection!.SelectionChanged += OnSelectionChanged;
         FolderSource.Sort(FolderTreeNodeModel.SortAscending(x => x.Name));
-        
-        AssetsSource = new FlatTreeDataGridSource<AssetModel>(Array.Empty<AssetModel>())
-        {
-            Columns =
-            {
+
+        AssetsSource = new FlatTreeDataGridSource<AssetModel>(Array.Empty<AssetModel>()) {
+            Columns = {
                 new TextColumn<AssetModel, string>(
                     "Name",
                     x => x.Name,
                     new GridLength(2, GridUnitType.Star),
-                    new TextColumnOptions<AssetModel>()
-                    {
+                    new TextColumnOptions<AssetModel>() {
                         CompareAscending = AssetModel.SortAscending(x => x.Name),
                         CompareDescending = AssetModel.SortDescending(x => x.Name),
                     }),
@@ -90,17 +85,15 @@ public partial class DataExplorerViewModel : Tool
                     "Type",
                     x => x.Type,
                     new GridLength(1, GridUnitType.Star),
-                    new TextColumnOptions<AssetModel>()
-                    {
+                    new TextColumnOptions<AssetModel>() {
                         CompareAscending = AssetModel.SortAscending(x => x.Type),
                         CompareDescending = AssetModel.SortDescending(x => x.Type),
                     })
             }
         };
-        
     }
 
-    private void OnSelectionChanged(object? sender, TreeSelectionModelSelectionChangedEventArgs<FolderTreeNodeModel> e)
+    private void OnSelectionChanged (object? sender, TreeSelectionModelSelectionChangedEventArgs<FolderTreeNodeModel> e)
     {
         FolderTreeNodeModel? b = e.SelectedItems[0];
         if (b is null)
@@ -115,13 +108,14 @@ public partial class DataExplorerViewModel : Tool
     {
         private readonly Bitmap m_folderExpanded;
         private readonly Bitmap m_folderCollapsed;
-        public FolderIconConvert(Bitmap folderExpanded, Bitmap folderCollapsed)
+
+        public FolderIconConvert (Bitmap folderExpanded, Bitmap folderCollapsed)
         {
             m_folderExpanded = folderExpanded;
             m_folderCollapsed = folderCollapsed;
         }
 
-        public object? Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
+        public object? Convert (IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
         {
             if (values.Count == 1 &&
                 values[0] is bool isExpanded)

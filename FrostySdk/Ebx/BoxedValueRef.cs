@@ -10,10 +10,10 @@ public class BoxedValueRef
     public TypeFlags.TypeEnum Type => m_type;
     public TypeFlags.TypeEnum ArrayType => m_subType;
     public EbxFieldCategory Category => m_category;
+
     public string TypeString
     {
-        get
-        {
+        get {
             switch (m_type)
             {
                 case TypeFlags.TypeEnum.Array:
@@ -34,24 +34,25 @@ public class BoxedValueRef
     private readonly TypeFlags.TypeEnum m_subType;
     private readonly EbxFieldCategory m_category;
 
-    public BoxedValueRef()
+    public BoxedValueRef ()
     {
     }
 
-    public BoxedValueRef(object? inValue, TypeFlags.TypeEnum inType)
+    public BoxedValueRef (object? inValue, TypeFlags.TypeEnum inType)
     {
         m_value = inValue;
         m_type = inType;
     }
 
-    public BoxedValueRef(object? inValue, TypeFlags.TypeEnum inType, TypeFlags.TypeEnum inSubType)
+    public BoxedValueRef (object? inValue, TypeFlags.TypeEnum inType, TypeFlags.TypeEnum inSubType)
     {
         m_value = inValue;
         m_type = inType;
         m_subType = inSubType;
     }
 
-    public BoxedValueRef(object? inValue, TypeFlags.TypeEnum inType, TypeFlags.TypeEnum inSubType, EbxFieldCategory inCategory)
+    public BoxedValueRef (object? inValue, TypeFlags.TypeEnum inType, TypeFlags.TypeEnum inSubType,
+        EbxFieldCategory inCategory)
     {
         m_value = inValue;
         m_type = inType;
@@ -59,12 +60,12 @@ public class BoxedValueRef
         m_category = inCategory;
     }
 
-    public void SetValue(object inValue)
+    public void SetValue (object inValue)
     {
         m_value = inValue;
     }
 
-    public override string ToString()
+    public override string ToString ()
     {
         if (m_value is null)
         {
@@ -94,7 +95,7 @@ public class BoxedValueRef
         return $"{s}'";
     }
 
-    private string EbxTypeToString(TypeFlags.TypeEnum typeToConvert, Type actualType)
+    private string EbxTypeToString (TypeFlags.TypeEnum typeToConvert, Type actualType)
     {
         switch (typeToConvert)
         {
