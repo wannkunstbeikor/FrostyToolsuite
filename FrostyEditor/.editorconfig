@@ -1,7 +1,7 @@
+root = true
 
 # This file will both effect Visual Studio and Rider, do not remove anything even IDE is warning you
 # Use Rider or ReSharper for better EditorConfig support
-root = true
 
 ###############################
 # Core EditorConfig Options   #
@@ -17,13 +17,6 @@ charset = utf-8
 ###############################
 # JetBrains Options           #
 ###############################
-
-# VS Settings for ReSharper
-csharp_new_line_before_members_in_object_initializers = false
-csharp_preferred_modifier_order = public, private, protected, internal, file, new, static, abstract, virtual, sealed, readonly, override, extern, unsafe, volatile, async, required:suggestion
-csharp_style_var_elsewhere = false
-csharp_style_var_for_built_in_types = false
-csharp_style_var_when_type_is_apparent = false
 
 # Indent options
 resharper_indent_nested_fixed_stmt = true
@@ -47,6 +40,11 @@ resharper_xmldoc_tab_width = 2
 resharper_xmldoc_attribute_indent = align_by_first_attribute
 resharper_xmldoc_space_before_self_closing = true
 
+# XAML options
+resharper_xml_indent_size = 2
+resharper_xml_pi_attribute_style = on_single_line
+resharper_xml_tab_width = 2
+
 ###############################
 # Core EditorConfig Options   #
 ###############################
@@ -60,7 +58,7 @@ indent_size = 2
 indent_size = 2
 
 # XAML files
-[*.{xaml,axaml}]
+[*.{appxmanifest,axaml,build,dtd,paml,xaml,xamlx,xoml,xsd}]
 indent_size = 2
 
 # Code files
@@ -127,6 +125,10 @@ csharp_style_namespace_declarations = file_scoped:warning # This actually suppor
 dotnet_style_prefer_is_null_check_over_reference_equality_method = true
 csharp_prefer_braces = true:warning
 csharp_prefer_simple_using_statement = false
+csharp_preferred_modifier_order = public, private, protected, internal, file, new, static, abstract, virtual, sealed, readonly, override, extern, unsafe, volatile, async, required:suggestion # This actually support by Rider, don't remove it.
+csharp_style_var_elsewhere = false
+csharp_style_var_for_built_in_types = false
+csharp_style_var_when_type_is_apparent = false
 
 ###############################
 # Naming Conventions          #
