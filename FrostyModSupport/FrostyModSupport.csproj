@@ -10,9 +10,5 @@
     <ItemGroup>
       <ProjectReference Include="..\FrostySdk\FrostySdk.csproj" />
     </ItemGroup>
-
-    <ItemGroup>
-      <EditorConfigFiles Include=".editorconfig" />
-    </ItemGroup>
-
+  
 </Project>
