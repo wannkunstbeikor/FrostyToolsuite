@@ -121,7 +121,7 @@ csharp_preserve_single_line_statements = false
 
 # Other options
 csharp_using_directive_placement = outside_namespace
-csharp_style_namespace_declarations = file_scoped:warning # This actually support by Rider, don't remove it.
+csharp_style_namespace_declarations = file_scoped:error # This actually support by Rider, don't remove it.
 dotnet_style_prefer_is_null_check_over_reference_equality_method = true
 csharp_prefer_braces = true:warning
 csharp_prefer_simple_using_statement = false
