@@ -45,6 +45,12 @@ resharper_xml_indent_size = 2
 resharper_xml_pi_attribute_style = on_single_line
 resharper_xml_tab_width = 2
 
+# Other options
+resharper_csharp_type_declaration_braces = next_line
+resharper_csharp_brace_style = next_line
+resharper_type_declaration_braces = next_line
+resharper_brace_style = next_line
+
 ###############################
 # Core EditorConfig Options   #
 ###############################
@@ -79,7 +85,7 @@ dotnet_separate_import_directive_groups = false
 ###############################
 
 # New-line options
-csharp_new_line_before_open_brace = methods, properties, control_blocks, types
+csharp_new_line_before_open_brace = all
 csharp_new_line_before_else = true
 csharp_new_line_before_catch = true
 csharp_new_line_before_finally = true
@@ -93,7 +99,7 @@ csharp_indent_switch_labels = true
 csharp_indent_labels = flush_left
 csharp_indent_block_contents = true
 csharp_indent_braces = false
-csharp_indent_case_contents_when_block = true
+csharp_indent_case_contents_when_block = false
 
 # Spacing options
 csharp_space_after_keywords_in_control_flow_statements = true
@@ -102,7 +108,7 @@ csharp_space_after_colon_in_inheritance_clause = true
 csharp_space_around_binary_operators = before_and_after
 csharp_space_between_method_declaration_parameter_list_parentheses = false
 csharp_space_between_method_declaration_empty_parameter_list_parentheses = false
-csharp_space_between_method_declaration_name_and_open_parenthesis = true
+csharp_space_between_method_declaration_name_and_open_parenthesis = false
 csharp_space_between_method_call_empty_parameter_list_parentheses = false
 csharp_space_between_method_call_name_and_opening_parenthesis = false
 csharp_space_after_comma = true
@@ -115,7 +121,6 @@ csharp_space_around_declaration_statements = false
 csharp_space_before_open_square_brackets = false
 csharp_space_between_empty_square_brackets = false
 csharp_space_between_square_brackets = false
-
 # Wrap options
 csharp_preserve_single_line_statements = false
 
