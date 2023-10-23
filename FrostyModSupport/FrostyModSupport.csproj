@@ -10,5 +10,5 @@
     <ItemGroup>
       <ProjectReference Include="..\FrostySdk\FrostySdk.csproj" />
     </ItemGroup>
-  
+
 </Project>
