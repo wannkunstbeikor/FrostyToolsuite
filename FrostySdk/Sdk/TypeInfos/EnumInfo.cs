@@ -4,7 +4,7 @@ namespace Frosty.Sdk.Sdk.TypeInfos;
 
 internal class EnumInfo : TypeInfo
 {
-    public EnumInfo (EnumInfoData data)
+    public EnumInfo(EnumInfoData data)
         : base(data)
     {
     }

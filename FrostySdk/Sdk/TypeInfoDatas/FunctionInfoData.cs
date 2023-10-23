@@ -17,7 +17,7 @@ internal class FunctionInfoData : TypeInfoData
     private List<ParameterInfo> m_parameterInfos = new();
     private Modifier m_modifier;
 
-    public override void Read (MemoryReader reader)
+    public override void Read(MemoryReader reader)
     {
         base.Read(reader);
 
@@ -43,7 +43,7 @@ internal class FunctionInfoData : TypeInfoData
         }
     }
 
-    public override void CreateType (StringBuilder sb)
+    public override void CreateType(StringBuilder sb)
     {
         base.CreateType(sb);
 
@@ -75,8 +75,8 @@ internal class FunctionInfoData : TypeInfoData
                     }
                     else
                     {
-                    }
 
+                    }
                     returnType = typeName;
                     break;
                 case 2:
@@ -89,8 +89,8 @@ internal class FunctionInfoData : TypeInfoData
                     }
                     else
                     {
-                    }
 
+                    }
                     returnType = $"{typeName}*";
                     break;
             }
@@ -101,8 +101,7 @@ internal class FunctionInfoData : TypeInfoData
             inputParams.Remove(inputParams.Length - 2, 2);
         }
 
-        sb.AppendLine(
-            $"public unsafe{(m_modifier == Modifier.Virtual ? " virtual" : m_modifier == Modifier.Override ? " override" : "")} {returnType} {m_name} ({inputParams})");
+        sb.AppendLine($"public unsafe{(m_modifier == Modifier.Virtual ? " virtual": m_modifier == Modifier.Override ? " override" : "")} {returnType} {m_name} ({inputParams})");
 
         sb.AppendLine("{");
 

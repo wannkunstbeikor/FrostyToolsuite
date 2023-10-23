@@ -20,7 +20,7 @@ internal class TypeInfoData
     protected ushort m_fieldCount;
     protected uint m_signature;
 
-    public static TypeInfoData ReadTypeInfoData (MemoryReader reader)
+    public static TypeInfoData ReadTypeInfoData(MemoryReader reader)
     {
         TypeInfoData retVal;
         string name = string.Empty;
@@ -106,7 +106,7 @@ internal class TypeInfoData
         return retVal;
     }
 
-    public virtual void Read (MemoryReader reader)
+    public virtual void Read(MemoryReader reader)
     {
         m_size = reader.ReadUShort();
 
@@ -134,29 +134,26 @@ internal class TypeInfoData
         }
     }
 
-    public void SetGuid (Guid guid) => m_guid = guid;
+    public void SetGuid(Guid guid) => m_guid = guid;
 
-    public string GetName () => m_name;
+    public string GetName() => m_name;
 
-    public TypeFlags GetFlags () => m_flags;
+    public TypeFlags GetFlags() => m_flags;
 
-    public virtual void CreateType (StringBuilder sb)
+    public virtual void CreateType(StringBuilder sb)
     {
-        sb.AppendLine(
-            $"[{nameof(EbxTypeMetaAttribute)}({(ushort)m_flags}, {m_alignment}, {m_size}, \"{m_nameSpace}\")]");
+        sb.AppendLine($"[{nameof(EbxTypeMetaAttribute)}({(ushort)m_flags}, {m_alignment}, {m_size}, \"{m_nameSpace}\")]");
 
         sb.AppendLine($"[{nameof(DisplayNameAttribute)}(\"{m_name}\")]");
-
+        
         if (!m_guid.Equals(Guid.Empty))
         {
             sb.AppendLine($"[{nameof(GuidAttribute)}(\"{m_guid}\")]");
         }
-
         if (m_nameHash != 0)
         {
             sb.AppendLine($"[{nameof(NameHashAttribute)}({m_nameHash})]");
         }
-
         if (m_signature != 0)
         {
             sb.AppendLine($"[{nameof(SignatureAttribute)}({m_signature})]");
@@ -169,9 +166,9 @@ internal class TypeInfoData
         }
     }
 
-    public string CleanUpName () => CleanUpString(m_name);
+    public string CleanUpName() => CleanUpString(m_name);
 
-    public string CleanUpString (string name)
+    public string CleanUpString(string name)
     {
         if (name == "char")
         {
@@ -182,7 +179,6 @@ internal class TypeInfoData
         {
             return name[(name.IndexOf("::", StringComparison.Ordinal) + 2)..];
         }
-
         return name.Replace(':', '_').Replace("<", "_").Replace(">", "_");
     }
 }

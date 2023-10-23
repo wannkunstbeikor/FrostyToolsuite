@@ -11,34 +11,31 @@ internal class TypeInfo
 {
     public static int Version
     {
-        get {
+        get
+        {
             if (ProfilesLibrary.FrostbiteVersion <= "2014.1")
             {
                 // 2013.2, 2014.1
                 return 1;
             }
-
             if (ProfilesLibrary.FrostbiteVersion <= "2014.4.17")
             {
                 // ushort FieldCount
                 // 2014.4.11, 2014.4.17
                 return 2;
             }
-
             if (ProfilesLibrary.FrostbiteVersion <= "2015.4.6")
             {
                 // ArrayInfo in TypeInfoData
                 // 2015.4, 2015.4.6
                 return 3;
             }
-
             if (ProfilesLibrary.FrostbiteVersion <= "2016.4.7")
             {
                 // Signature Guid in TypeInfo
                 // 2016.4.1, 2016.4.4, 2016.4.7, (2018.0 (BfV), 2019-PR5 (SWBfII) -> changed to 2016.4.4)
                 return 4;
             }
-
             if (ProfilesLibrary.FrostbiteVersion <= "2018.2")
             {
                 // Guid and NameHash in TypeInfoData
@@ -60,12 +57,12 @@ internal class TypeInfo
     protected ushort m_id;
     protected ushort m_flags;
 
-    public TypeInfo (TypeInfoData data)
+    public TypeInfo(TypeInfoData data)
     {
         m_data = data;
     }
 
-    public static TypeInfo ReadTypeInfo (MemoryReader reader)
+    public static TypeInfo ReadTypeInfo(MemoryReader reader)
     {
         long startPos = reader.Position;
 
@@ -88,42 +85,36 @@ internal class TypeInfo
         return retVal;
     }
 
-    public static TypeInfo CreateTypeInfo (TypeInfoData data)
+    public static TypeInfo CreateTypeInfo(TypeInfoData data)
     {
         if (data is StructInfoData structData)
         {
             return new StructInfo(structData);
         }
-
         if (data is ClassInfoData classData)
         {
             return new ClassInfo(classData);
         }
-
         if (data is ArrayInfoData arrayData)
         {
             return new ArrayInfo(arrayData);
         }
-
         if (data is EnumInfoData enumData)
         {
             return new EnumInfo(enumData);
         }
-
         if (data is FunctionInfoData functionData)
         {
             return new FunctionInfo(functionData);
         }
-
         if (data is DelegateInfoData delegateData)
         {
             return new DelegateInfo(delegateData);
         }
-
         return new TypeInfo(data);
     }
 
-    public virtual void Read (MemoryReader reader)
+    public virtual void Read(MemoryReader reader)
     {
         if (Version > 5)
         {
@@ -136,7 +127,6 @@ internal class TypeInfo
         {
             m_data.SetGuid(reader.ReadGuid());
         }
-
         if (Version == 4 || Version == 5)
         {
             // signature
@@ -147,22 +137,21 @@ internal class TypeInfo
         m_flags = reader.ReadUShort();
     }
 
-    public TypeInfo? GetNextTypeInfo (MemoryReader reader)
+    public TypeInfo? GetNextTypeInfo(MemoryReader reader)
     {
         if (p_next == 0)
         {
             return null;
         }
-
         reader.Position = p_next;
         return ReadTypeInfo(reader);
     }
+    
+    public string GetName() => m_data.CleanUpName();
 
-    public string GetName () => m_data.CleanUpName();
+    public TypeFlags GetFlags() => m_data.GetFlags();
 
-    public TypeFlags GetFlags () => m_data.GetFlags();
-
-    public void CreateType (StringBuilder sb)
+    public void CreateType(StringBuilder sb)
     {
         m_data.CreateType(sb);
     }

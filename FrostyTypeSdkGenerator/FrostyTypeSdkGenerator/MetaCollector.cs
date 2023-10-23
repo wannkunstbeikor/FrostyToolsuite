@@ -6,7 +6,7 @@ namespace FrostyTypeSdkGenerator;
 
 public class MetaCollector : CSharpSyntaxWalker
 {
-    public readonly Dictionary<string, Dictionary<string, string>> Meta = new();
+    public readonly Dictionary<string, Dictionary<string, string>> Meta = new(); 
     // public override void Visit(SyntaxNode? node)
     // {
     //     if (node is not TypeDeclarationSyntax typeDeclarationSyntax)
@@ -26,10 +26,10 @@ public class MetaCollector : CSharpSyntaxWalker
     //     }
     // }
 
-    public override void VisitClassDeclaration (ClassDeclarationSyntax node)
+    public override void VisitClassDeclaration(ClassDeclarationSyntax node)
     {
         string name = node.Identifier.Text;
-
+        
         // just expect there to be properties
         if (!Meta.ContainsKey(name))
         {
@@ -45,10 +45,10 @@ public class MetaCollector : CSharpSyntaxWalker
         }
     }
 
-    public override void VisitStructDeclaration (StructDeclarationSyntax node)
+    public override void VisitStructDeclaration(StructDeclarationSyntax node)
     {
         string name = node.Identifier.Text;
-
+        
         // just expect there to be properties
         if (!Meta.ContainsKey(name))
         {

@@ -15,31 +15,34 @@ public class App : Application
 {
     public static string ConfigPath =
         $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}/Frosty/editor_config.json";
-
+    
     public static IThemeManager? ThemeManager;
-
-    public override void Initialize ()
+    
+    public override void Initialize()
     {
         ThemeManager = new FluentThemeManager();
         ThemeManager.Initialize(this);
-
+        
         Config.Load(ConfigPath);
 
         AvaloniaXamlLoader.Load(this);
     }
 
-    public override void OnFrameworkInitializationCompleted ()
+    public override void OnFrameworkInitializationCompleted()
     {
         switch (ApplicationLifetime)
         {
             case IClassicDesktopStyleApplicationLifetime desktopLifetime:
+            {
+                ProfileSelectWindow selectWindow = new()
                 {
-                    ProfileSelectWindow selectWindow = new() { DataContext = new ProfileSelectWindowViewModel() };
+                    DataContext = new ProfileSelectWindowViewModel()
+                };
 
-                    desktopLifetime.MainWindow = selectWindow;
+                desktopLifetime.MainWindow = selectWindow;
 
-                    break;
-                }
+                break;
+            }
         }
 
         base.OnFrameworkInitializationCompleted();

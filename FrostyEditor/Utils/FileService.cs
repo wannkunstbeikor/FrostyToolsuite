@@ -14,7 +14,7 @@ public static class FileService
     /// </summary>
     /// <param name="inOptions">Options for the dialog.</param>
     /// <returns>Array of selected <see cref="IStorageFile"/> or empty collection if user canceled the dialog or null if no MainWindow was found.</returns>
-    public static async Task<IReadOnlyList<IStorageFile>?> OpenFilesAsync (FilePickerOpenOptions inOptions)
+    public static async Task<IReadOnlyList<IStorageFile>?> OpenFilesAsync(FilePickerOpenOptions inOptions)
     {
         TopLevel? topLevel = (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)
             ?.MainWindow;
@@ -23,7 +23,7 @@ public static class FileService
         {
             return null;
         }
-
+        
         return await topLevel.StorageProvider.OpenFilePickerAsync(inOptions);
     }
 }

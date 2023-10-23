@@ -8,15 +8,15 @@ namespace Frosty.Sdk.Interfaces;
 
 public interface IFileInfo
 {
-    public bool IsComplete ();
+    public bool IsComplete();
+    
+    public Block<byte> GetRawData();
+    
+    public Block<byte> GetData(int inOriginalSize = 0);
 
-    public Block<byte> GetRawData ();
+    protected void SerializeInternal(DataStream stream);
 
-    public Block<byte> GetData (int inOriginalSize = 0);
-
-    protected void SerializeInternal (DataStream stream);
-
-    public static void Serialize (DataStream stream, IFileInfo fileInfo)
+    public static void Serialize(DataStream stream, IFileInfo fileInfo)
     {
         switch (fileInfo)
         {
@@ -29,11 +29,9 @@ public interface IFileInfo
             default:
                 throw new NotImplementedException();
         }
-
         fileInfo.SerializeInternal(stream);
     }
-
-    public static IFileInfo Deserialize (DataStream stream)
+    public static IFileInfo Deserialize(DataStream stream)
     {
         byte type = stream.ReadByte();
 

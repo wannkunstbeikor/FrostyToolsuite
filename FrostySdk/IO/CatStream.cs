@@ -8,17 +8,17 @@ public class CatStream : IDisposable
     public uint ResourceCount { get; }
     public uint PatchCount { get; }
     public uint EncryptedCount { get; }
-
+    
     private const string c_catMagic = "NyanNyanNyanNyan";
 
     private readonly DataStream m_stream;
     private readonly bool m_isNewFormat;
 
-    public CatStream (string inFilename)
+    public CatStream(string inFilename)
     {
         m_isNewFormat = ProfilesLibrary.FrostbiteVersion > "2014.4.11";
         m_stream = BlockStream.FromFile(inFilename, m_isNewFormat);
-
+        
         string magic = m_stream.ReadFixedSizedString(16);
         if (magic != c_catMagic)
         {
@@ -44,24 +44,28 @@ public class CatStream : IDisposable
         }
     }
 
-    public CatResourceEntry ReadResourceEntry ()
+    public CatResourceEntry ReadResourceEntry()
     {
-        CatResourceEntry entry = new() {
-            Sha1 = m_stream.ReadSha1(), Offset = m_stream.ReadUInt32(), Size = m_stream.ReadUInt32()
+        CatResourceEntry entry = new()
+        {
+            Sha1 = m_stream.ReadSha1(),
+            Offset = m_stream.ReadUInt32(),
+            Size = m_stream.ReadUInt32()
         };
 
         if (m_isNewFormat)
         {
             entry.LogicalOffset = m_stream.ReadUInt32();
         }
-
+        
         entry.ArchiveIndex = m_stream.ReadInt32() & 0xFF;
         return entry;
     }
 
-    public CatResourceEntry ReadEncryptedEntry ()
+    public CatResourceEntry ReadEncryptedEntry()
     {
-        CatResourceEntry entry = new() {
+        CatResourceEntry entry = new()
+        {
             Sha1 = m_stream.ReadSha1(),
             Offset = m_stream.ReadUInt32(),
             Size = m_stream.ReadUInt32(),
@@ -76,15 +80,18 @@ public class CatStream : IDisposable
         return entry;
     }
 
-    public CatPatchEntry ReadPatchEntry ()
+    public CatPatchEntry ReadPatchEntry()
     {
-        CatPatchEntry entry = new() {
-            Sha1 = m_stream.ReadSha1(), BaseSha1 = m_stream.ReadSha1(), DeltaSha1 = m_stream.ReadSha1()
+        CatPatchEntry entry = new()
+        {
+            Sha1 = m_stream.ReadSha1(),
+            BaseSha1 = m_stream.ReadSha1(),
+            DeltaSha1 = m_stream.ReadSha1()
         };
         return entry;
     }
 
-    public void Dispose ()
+    public void Dispose()
     {
         m_stream.Dispose();
     }

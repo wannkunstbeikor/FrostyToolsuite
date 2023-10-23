@@ -4,7 +4,7 @@ namespace Frosty.Sdk.Sdk.TypeInfos;
 
 internal class FunctionInfo : TypeInfo
 {
-    public FunctionInfo (FunctionInfoData data)
+    public FunctionInfo(FunctionInfoData data)
         : base(data)
     {
     }

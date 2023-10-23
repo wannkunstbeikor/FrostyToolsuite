@@ -22,21 +22,21 @@ public abstract class DbObject
         Guid = 15,
         Sha1 = 16,
         Blob = 19,
-
+        
         Anonymous = 1 << 7
     }
-
+    
     public string Name { get; private set; }
 
     private readonly Type m_type;
 
-    protected DbObject (Type inType)
+    protected DbObject(Type inType)
     {
         Name = string.Empty;
         m_type = inType;
     }
 
-    protected DbObject (Type inType, string inName)
+    protected DbObject(Type inType, string inName)
         : this(inType)
     {
         Name = inName;
@@ -47,28 +47,28 @@ public abstract class DbObject
     /// </summary>
     /// <param name="path">The path of the file.</param>
     /// <param name="value">The <see cref="DbObject"/> to serialize.</param>
-    public static void Serialize (string path, DbObject value)
+    public static void Serialize(string path, DbObject value)
     {
         using (DataStream stream = new(new FileStream(path, FileMode.Create, FileAccess.ReadWrite)))
         {
             Serialize(stream, value);
         }
     }
-
+    
     /// <summary>
     /// Serializes a <see cref="DbObject"/> to a <see cref="DataStream"/>.
     /// </summary>
     /// <param name="stream">The <see cref="DataStream"/> to serialize the <see cref="DbObject"/> to.</param>
     /// <param name="value">The <see cref="DbObject"/> to serialize.</param>
-    public static void Serialize (DataStream stream, DbObject value)
+    public static void Serialize(DataStream stream, DbObject value)
     {
         stream.WriteByte((byte)value.m_type);
-
+        
         if (!value.m_type.HasFlag(Type.Anonymous))
         {
             stream.WriteNullTerminatedString(value.Name);
         }
-
+        
         value.InternalSerialize(stream);
     }
 
@@ -77,7 +77,7 @@ public abstract class DbObject
     /// </summary>
     /// <param name="path">The path of the file.</param>
     /// <returns>The deserialized <see cref="DbObject"/>.</returns>
-    public static DbObject? Deserialize (string path)
+    public static DbObject? Deserialize(string path)
     {
         using (BlockStream stream = BlockStream.FromFile(path, true))
         {
@@ -90,106 +90,106 @@ public abstract class DbObject
     /// </summary>
     /// <param name="stream">The <see cref="DataStream"/> to deserialize the <see cref="DbObject"/> from.</param>
     /// <returns>The deserialized <see cref="DbObject"/>.</returns>
-    public static DbObject? Deserialize (DataStream stream)
+    public static DbObject? Deserialize(DataStream stream)
     {
         Type type = (Type)stream.ReadByte();
-
+        
         DbObject? obj = CreateDbObject(type);
 
         if (obj is null)
         {
             return obj;
         }
-
+        
         if (!type.HasFlag(Type.Anonymous))
         {
             obj.Name = stream.ReadNullTerminatedString();
         }
-
+        
         obj.InternalDeserialize(stream);
 
         return obj;
     }
 
-    public virtual bool IsDict () => false;
-
-    public virtual DbObjectDict AsDict ()
+    public virtual bool IsDict() => false;
+    
+    public virtual DbObjectDict AsDict()
     {
         throw new Exception();
     }
 
-    public virtual bool IsList () => false;
-
-    public virtual DbObjectList AsList ()
+    public virtual bool IsList() => false;
+    
+    public virtual DbObjectList AsList()
     {
         throw new Exception();
     }
 
-    public virtual bool AsBoolean ()
+    public virtual bool AsBoolean()
     {
         throw new Exception();
     }
 
-    public virtual string AsString ()
+    public virtual string AsString()
     {
         throw new Exception();
     }
 
-    public virtual int AsInt ()
+    public virtual int AsInt()
     {
         throw new Exception();
     }
 
-    public virtual uint AsUInt ()
+    public virtual uint AsUInt()
     {
         throw new Exception();
     }
 
-    public virtual long AsLong ()
+    public virtual long AsLong()
     {
         throw new Exception();
     }
 
-    public virtual ulong AsULong ()
+    public virtual ulong AsULong()
     {
         throw new Exception();
     }
 
-    public virtual float AsFloat ()
+    public virtual float AsFloat()
     {
         throw new Exception();
     }
 
-    public virtual double AsDouble ()
+    public virtual double AsDouble()
     {
         throw new Exception();
     }
 
-    public virtual Guid AsGuid ()
+    public virtual Guid AsGuid()
     {
         throw new Exception();
     }
 
-    public virtual Sha1 AsSha1 ()
+    public virtual Sha1 AsSha1()
     {
         throw new Exception();
     }
 
-    public virtual byte[] AsBlob ()
+    public virtual byte[] AsBlob()
     {
         throw new Exception();
     }
 
-    public static DbObjectDict CreateDict (int capacity = 0) => new(capacity);
-    public static DbObjectDict CreateDict (string name, int capacity = 0) => new(name, capacity);
-    public static DbObjectList CreateList (int capacity = 0) => new(capacity);
-    public static DbObjectList CreateList (string name, int capacity = 0) => new(name, capacity);
+    public static DbObjectDict CreateDict(int capacity = 0) => new(capacity);
+    public static DbObjectDict CreateDict(string name, int capacity = 0) => new(name, capacity);
+    public static DbObjectList CreateList(int capacity = 0) => new(capacity);
+    public static DbObjectList CreateList(string name, int capacity = 0) => new(name, capacity);
+    
+    protected abstract void InternalSerialize(DataStream stream);
+    
+    protected abstract void InternalDeserialize(DataStream stream);
 
-    protected abstract void InternalSerialize (DataStream stream);
-
-    protected abstract void InternalDeserialize (DataStream stream);
-
-    private static DbObject? CreateDbObject (Type type)
+    private static DbObject? CreateDbObject(Type type)
     {
         DbObject obj;
         switch (type & ~Type.Anonymous)

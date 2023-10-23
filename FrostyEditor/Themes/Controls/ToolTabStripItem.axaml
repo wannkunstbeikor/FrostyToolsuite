@@ -19,17 +19,17 @@
     <MenuItem Header="_Float"
               Command="{Binding Owner.Factory.FloatDockable}"
               CommandParameter="{Binding}"
-              IsVisible="{Binding CanFloat}" />
+              IsVisible="{Binding CanFloat}"/>
     <MenuItem Header="_Hide"
               Command="{Binding Owner.Factory.PinDockable}"
               CommandParameter="{Binding}"
-              IsVisible="{Binding CanPin}" />
+              IsVisible="{Binding CanPin}"/>
     <MenuItem Header="_Close"
               Command="{Binding Owner.Factory.CloseDockable}"
               CommandParameter="{Binding}"
-              IsVisible="{Binding CanClose}" />
+              IsVisible="{Binding CanClose}"/>
   </ContextMenu>
-
+  
   <ControlTheme x:Key="{x:Type ToolTabStripItem}" TargetType="ToolTabStripItem">
 
     <Setter Property="(TextElement.FontSize)" Value="{DynamicResource DockFontSizeNormal}" />
@@ -45,29 +45,29 @@
 
     <Setter Property="Template">
       <ControlTemplate>
-        <Border Background="{TemplateBinding Background}"
-                TextElement.FontFamily="{TemplateBinding FontFamily}"
-                TextElement.FontSize="{TemplateBinding FontSize}"
-                TextElement.FontWeight="{TemplateBinding FontWeight}"
-                BorderBrush="{TemplateBinding BorderBrush}"
-                BorderThickness="{TemplateBinding BorderThickness}"
-                Padding="{TemplateBinding Padding}"
-                ContextMenu="{DynamicResource ToolTabStripItemContextMenu}"
-                x:DataType="dmc:IToolDock" x:CompileBindings="True">
-          <DockableControl TrackingMode="Tab">
-            <StackPanel x:Name="DragTool"
-                        Background="Transparent"
-                        Orientation="Horizontal"
-                        Spacing="2"
-                        DockProperties.IsDragArea="True"
-                        DockProperties.IsDropArea="True">
-              <Panel Margin="2">
-                <ContentPresenter ContentTemplate="{Binding $parent[ToolControl].HeaderTemplate}"
-                                  Content="{Binding}" />
-              </Panel>
-            </StackPanel>
-          </DockableControl>
-        </Border>
+          <Border Background="{TemplateBinding Background}"
+                  TextElement.FontFamily="{TemplateBinding FontFamily}"
+                  TextElement.FontSize="{TemplateBinding FontSize}"
+                  TextElement.FontWeight="{TemplateBinding FontWeight}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  Padding="{TemplateBinding Padding}"
+                  ContextMenu="{DynamicResource ToolTabStripItemContextMenu}"
+                  x:DataType="dmc:IToolDock" x:CompileBindings="True">
+            <DockableControl TrackingMode="Tab">
+              <StackPanel x:Name="DragTool"
+                          Background="Transparent"
+                          Orientation="Horizontal"
+                          Spacing="2"
+                          DockProperties.IsDragArea="True"
+                          DockProperties.IsDropArea="True">
+                <Panel Margin="2">
+                  <ContentPresenter ContentTemplate="{Binding $parent[ToolControl].HeaderTemplate}"
+                                    Content="{Binding}" />
+                </Panel>
+              </StackPanel>
+            </DockableControl>
+          </Border>
       </ControlTemplate>
     </Setter>
 
@@ -87,8 +87,8 @@
     <Style Selector="^:selected:pointerover">
       <Setter Property="Background" Value="{DynamicResource DockThemeBackgroundBrush}" />
       <Setter Property="BorderBrush" Value="{DynamicResource DockThemeBorderLowBrush}" />
-    </Style>
-
+    </Style> 
+    
   </ControlTheme>
 
 </ResourceDictionary>

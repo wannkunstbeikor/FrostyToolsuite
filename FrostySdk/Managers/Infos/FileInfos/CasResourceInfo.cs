@@ -11,17 +11,16 @@ public class CasResourceInfo
     private readonly uint m_offset;
     private readonly uint m_size;
     private readonly uint m_logicalOffset;
-
-    public CasResourceInfo (CasFileIdentifier inCasFileIdentifier, uint inOffset, uint inSize, uint inLogicalOffset)
+    
+    public CasResourceInfo(CasFileIdentifier inCasFileIdentifier, uint inOffset, uint inSize, uint inLogicalOffset)
     {
         m_casFileIdentifier = inCasFileIdentifier;
         m_offset = inOffset;
         m_size = inSize;
         m_logicalOffset = inLogicalOffset;
     }
-
-    public CasResourceInfo (bool inIsPatch, int inInstallChunkIndex, int inCasIndex, uint inOffset, uint inSize,
-        uint inLogicalOffset)
+    
+    public CasResourceInfo(bool inIsPatch, int inInstallChunkIndex, int inCasIndex, uint inOffset, uint inSize, uint inLogicalOffset)
     {
         m_casFileIdentifier = new CasFileIdentifier(inIsPatch, inInstallChunkIndex, inCasIndex);
         m_offset = inOffset;
@@ -29,26 +28,26 @@ public class CasResourceInfo
         m_logicalOffset = inLogicalOffset;
     }
 
-    public string GetPath () => FileSystemManager.ResolvePath(FileSystemManager.GetFilePath(m_casFileIdentifier));
+    public string GetPath() => FileSystemManager.ResolvePath(FileSystemManager.GetFilePath(m_casFileIdentifier));
 
-    protected uint GetOffset () => m_offset;
-
-    public uint GetSize () => m_size;
-
-    public virtual Block<byte> GetRawData ()
+    protected uint GetOffset() => m_offset;
+    
+    public uint GetSize() => m_size;
+    
+    public virtual Block<byte> GetRawData()
     {
         using (FileStream stream = new(GetPath(), FileMode.Open, FileAccess.Read))
         {
             stream.Position = m_offset;
 
             Block<byte> retVal = new((int)m_size);
-
+            
             stream.ReadExactly(retVal);
             return retVal;
         }
     }
 
-    public virtual Block<byte> GetData (int inOriginalSize)
+    public virtual Block<byte> GetData(int inOriginalSize)
     {
         using (BlockStream stream = BlockStream.FromFile(GetPath(), m_offset, (int)m_size))
         {
@@ -56,7 +55,7 @@ public class CasResourceInfo
         }
     }
 
-    public static bool operator == (CasResourceInfo? a, CasResourceInfo? b)
+    public static bool operator ==(CasResourceInfo? a, CasResourceInfo? b)
     {
         return a?.m_casFileIdentifier == b?.m_casFileIdentifier &&
                a?.m_offset == b?.m_offset &&
@@ -64,7 +63,7 @@ public class CasResourceInfo
                a?.m_logicalOffset == b?.m_logicalOffset;
     }
 
-    public static bool operator != (CasResourceInfo? a, CasResourceInfo? b)
+    public static bool operator !=(CasResourceInfo? a, CasResourceInfo? b)
     {
         return a?.m_casFileIdentifier != b?.m_casFileIdentifier ||
                a?.m_offset != b?.m_offset ||
@@ -72,15 +71,15 @@ public class CasResourceInfo
                a?.m_logicalOffset != b?.m_logicalOffset;
     }
 
-    public bool Equals (CasResourceInfo b)
+    public bool Equals(CasResourceInfo b)
     {
         return m_casFileIdentifier == b.m_casFileIdentifier &&
                m_offset == b.m_offset &&
                m_size == b.m_size &&
                m_logicalOffset == b.m_logicalOffset;
     }
-
-    public override bool Equals (object? obj)
+    
+    public override bool Equals(object? obj)
     {
         if (obj is CasResourceInfo b)
         {
@@ -90,12 +89,12 @@ public class CasResourceInfo
         return false;
     }
 
-    public override int GetHashCode ()
+    public override int GetHashCode()
     {
         return HashCode.Combine(m_casFileIdentifier, m_offset, m_size, m_logicalOffset);
     }
 
-    public static void Serialize (DataStream stream, CasResourceInfo? info)
+    public static void Serialize(DataStream stream, CasResourceInfo? info)
     {
         if (info is null)
         {
@@ -113,8 +112,8 @@ public class CasResourceInfo
         stream.WriteByte(1);
         SerializeInternal(stream, info);
     }
-
-    public static CasResourceInfo? Deserialize (DataStream stream)
+    
+    public static CasResourceInfo? Deserialize(DataStream stream)
     {
         byte type = stream.ReadByte();
 
@@ -130,8 +129,8 @@ public class CasResourceInfo
                 throw new Exception("Not a valid CasResourceInfo type. Has to be 0, 1 or 2.");
         }
     }
-
-    protected static void SerializeInternal (DataStream stream, CasResourceInfo info)
+    
+    protected static void SerializeInternal(DataStream stream, CasResourceInfo info)
     {
         stream.WriteUInt32(CasFileIdentifier.ToFileIdentifier(info.m_casFileIdentifier));
         stream.WriteUInt32(info.m_offset);
@@ -139,7 +138,7 @@ public class CasResourceInfo
         stream.WriteUInt32(info.m_logicalOffset);
     }
 
-    private static CasResourceInfo DeserializeInternal (DataStream stream)
+    private static CasResourceInfo DeserializeInternal(DataStream stream)
     {
         CasFileIdentifier file = CasFileIdentifier.FromFileIdentifier(stream.ReadUInt32());
         uint offset = stream.ReadUInt32();

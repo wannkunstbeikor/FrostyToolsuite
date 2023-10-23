@@ -14,7 +14,7 @@ public static class EbxSharedTypeDescriptors
     private static List<EbxFieldDescriptor> s_fieldDescriptors = new();
     private static List<EbxTypeDescriptor> s_typeDescriptors = new();
 
-    public static void Initialize ()
+    public static void Initialize()
     {
         if (s_isInitialized)
         {
@@ -25,26 +25,26 @@ public static class EbxSharedTypeDescriptors
         {
             Read(FileSystemManager.GetFileFromMemoryFs("SharedTypeDescriptors.ebx"));
         }
-
+        
         s_isInitialized = true;
     }
 
-    public static EbxTypeDescriptor GetTypeDescriptor (Guid key)
+    public static EbxTypeDescriptor GetTypeDescriptor(Guid key)
     {
         return s_typeDescriptors[s_typeKeyMapping[key]];
     }
 
-    public static EbxTypeDescriptor GetTypeDescriptor (Guid key, short index)
+    public static EbxTypeDescriptor GetTypeDescriptor(Guid key, short index)
     {
         return s_typeDescriptors[s_typeKeyMapping[key] + index];
     }
 
-    public static EbxFieldDescriptor GetFieldDescriptor (int index)
+    public static EbxFieldDescriptor GetFieldDescriptor(int index)
     {
         return s_fieldDescriptors[index];
     }
-
-    private static void Read (Block<byte> file)
+    
+    private static void Read(Block<byte> file)
     {
         using (DataStream stream = new(file.ToStream()))
         {
@@ -57,16 +57,17 @@ public static class EbxSharedTypeDescriptors
 
             ushort typeDescriptorCount = stream.ReadUInt16();
             ushort fieldDescriptorCount = stream.ReadUInt16();
-
+            
             s_typeDescriptors.Capacity = typeDescriptorCount + s_typeDescriptors.Count;
             s_fieldDescriptors.Capacity = fieldDescriptorCount + s_fieldDescriptors.Count;
 
             int startTypes = s_typeDescriptors.Count;
             int startFields = s_fieldDescriptors.Count;
-
+            
             for (int i = 0; i < fieldDescriptorCount; i++)
             {
-                s_fieldDescriptors.Add(new EbxFieldDescriptor() {
+                s_fieldDescriptors.Add(new EbxFieldDescriptor()
+                {
                     NameHash = stream.ReadUInt32(),
                     Flags = stream.ReadUInt16(),
                     TypeDescriptorRef = (ushort)(stream.ReadUInt16() + startTypes),
@@ -74,14 +75,15 @@ public static class EbxSharedTypeDescriptors
                     SecondOffset = stream.ReadUInt32(),
                 });
             }
-
+            
             for (int i = 0; i < typeDescriptorCount; i++)
             {
                 long offset = stream.Position;
-
+                
                 Guid key = stream.ReadGuid();
-
-                EbxTypeDescriptor typeDescriptor = new() {
+                
+                EbxTypeDescriptor typeDescriptor = new()
+                {
                     NameHash = stream.ReadUInt32(),
                     FieldIndex = stream.ReadInt32(),
                     FieldCount = stream.ReadByte(),
@@ -102,7 +104,7 @@ public static class EbxSharedTypeDescriptors
                     typeDescriptor.FieldIndex = (int)((offset - typeDescriptor.FieldIndex - 0x08) / 0x10 + startFields);
                     s_typeKeyMapping.Add(key, s_typeDescriptors.Count);
                 }
-
+                
                 s_typeDescriptors.Add(typeDescriptor);
             }
         }

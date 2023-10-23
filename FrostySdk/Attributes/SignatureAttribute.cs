@@ -7,7 +7,7 @@ public class SignatureAttribute : Attribute
 {
     public uint Signature { get; }
 
-    public SignatureAttribute (uint inSignature)
+    public SignatureAttribute(uint inSignature)
     {
         Signature = inSignature;
     }

@@ -11,13 +11,13 @@ public class CustomAdditionalText : AdditionalText
 
     public override string Path { get; }
 
-    public CustomAdditionalText (string path)
+    public CustomAdditionalText(string path)
     {
         Path = path;
         m_text = File.ReadAllText(path);
     }
 
-    public override SourceText GetText (CancellationToken cancellationToken = new())
+    public override SourceText GetText(CancellationToken cancellationToken = new())
     {
         return SourceText.From(m_text);
     }

@@ -10,7 +10,7 @@
 
     <Setter Property="Template">
       <ControlTemplate>
-        <DockableControl TrackingMode="Visible"
+        <DockableControl TrackingMode="Visible" 
                          ProportionalStackPanelSplitter.Proportion="{Binding Proportion}">
           <ToolChromeControl IsActive="{Binding IsActive}"
                              IsVisible="{Binding !!VisibleDockables.Count}">

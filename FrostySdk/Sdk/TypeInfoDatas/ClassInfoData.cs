@@ -9,13 +9,13 @@ namespace Frosty.Sdk.Sdk.TypeInfoDatas;
 
 internal class ClassInfoData : TypeInfoData
 {
-    public ClassInfo GetSuperClassInfo () => (TypeInfo.TypeInfoMapping[p_superClass] as ClassInfo)!;
+    public ClassInfo GetSuperClassInfo() => (TypeInfo.TypeInfoMapping[p_superClass] as ClassInfo)!;
 
     private long p_superClass;
     private List<FieldInfo> m_fieldInfos = new();
     private List<MethodInfo> m_methodInfos = new();
 
-    public override void Read (MemoryReader reader)
+    public override void Read(MemoryReader reader)
     {
         base.Read(reader);
 
@@ -29,7 +29,6 @@ internal class ClassInfoData : TypeInfoData
         {
             reader.ReadLong();
         }
-
         long pFieldInfos = reader.ReadLong();
         long pMethodInfos = reader.ReadLong();
 
@@ -42,7 +41,6 @@ internal class ClassInfoData : TypeInfoData
                 m_fieldInfos[i].Read(reader, m_nameHash);
             }
         }
-
         if (TypeInfo.Version > 5)
         {
             if (pMethodInfos != 0)
@@ -62,7 +60,7 @@ internal class ClassInfoData : TypeInfoData
         }
     }
 
-    public override void CreateType (StringBuilder sb)
+    public override void CreateType(StringBuilder sb)
     {
         if (m_name.Contains("::"))
         {
@@ -70,7 +68,7 @@ internal class ClassInfoData : TypeInfoData
             sb.AppendLine($"public partial class {m_name[..m_name.IndexOf("::", StringComparison.Ordinal)]}");
             sb.AppendLine("{");
         }
-
+        
         base.CreateType(sb);
 
         sb.Append($"public partial class {CleanUpName()}");
@@ -82,7 +80,6 @@ internal class ClassInfoData : TypeInfoData
             superClassFieldCount = superClass.GetFieldCount();
             sb.Append($" : {superClass.GetName()}");
         }
-
         sb.AppendLine();
 
         sb.AppendLine("{");
@@ -101,12 +98,12 @@ internal class ClassInfoData : TypeInfoData
         }
 
         sb.AppendLine("}");
-
+        
         if (m_name.Contains("::"))
         {
             sb.AppendLine("}");
         }
     }
 
-    public int GetFieldCount () => m_fieldCount;
+    public int GetFieldCount() => m_fieldCount;
 }

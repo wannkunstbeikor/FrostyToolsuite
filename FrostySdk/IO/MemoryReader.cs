@@ -17,20 +17,18 @@ public class MemoryReader : IDisposable
     private const int PROCESS_WM_READ = 0x0010;
 
     [DllImport("kernel32.dll")]
-    private static extern IntPtr OpenProcess (int dwDesiredAccess, bool bInheritHandle, int dwProcessId);
+    private static extern IntPtr OpenProcess(int dwDesiredAccess, bool bInheritHandle, int dwProcessId);
 
     [DllImport("kernel32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool ReadProcessMemory (IntPtr hProcess, long lpBaseAddress, byte[] lpBuffer, int dwSize,
-        ref int lpNumberOfBytesRead);
+    private static extern bool ReadProcessMemory(IntPtr hProcess, long lpBaseAddress, byte[] lpBuffer, int dwSize, ref int lpNumberOfBytesRead);
 
     [DllImport("kernel32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool VirtualProtectEx (IntPtr hProcess, long lpAddress, UIntPtr dwSize, uint flNewProtect,
-        ref uint lpflOldProtect);
+    private static extern bool VirtualProtectEx(IntPtr hProcess, long lpAddress, UIntPtr dwSize, uint flNewProtect, ref uint lpflOldProtect);
 
     [DllImport("kernel32.dll", SetLastError = true)]
-    private static extern bool CloseHandle (IntPtr hObject);
+    private static extern bool CloseHandle(IntPtr hObject);
 
     public virtual long Position
     {
@@ -42,18 +40,18 @@ public class MemoryReader : IDisposable
     protected readonly byte[] m_buffer = new byte[20];
     protected long m_position;
 
-    public MemoryReader (Process process, long initialAddr)
+    public MemoryReader(Process process, long initialAddr)
     {
         m_handle = OpenProcess(PROCESS_WM_READ, false, process.Id);
         m_position = initialAddr;
     }
 
-    public virtual void Dispose ()
+    public virtual void Dispose()
     {
         CloseHandle(m_handle);
     }
 
-    public void Pad (int alignment)
+    public void Pad(int alignment)
     {
         while (Position % alignment != 0)
         {
@@ -61,13 +59,13 @@ public class MemoryReader : IDisposable
         }
     }
 
-    public byte ReadByte ()
+    public byte ReadByte()
     {
         FillBuffer(1);
         return m_buffer[0];
     }
 
-    public short ReadShort (bool pad = true)
+    public short ReadShort(bool pad = true)
     {
         if (pad)
         {
@@ -78,7 +76,7 @@ public class MemoryReader : IDisposable
         return (short)(m_buffer[0] | m_buffer[1] << 8);
     }
 
-    public ushort ReadUShort (bool pad = true)
+    public ushort ReadUShort(bool pad = true)
     {
         if (pad)
         {
@@ -89,7 +87,7 @@ public class MemoryReader : IDisposable
         return (ushort)(m_buffer[0] | m_buffer[1] << 8);
     }
 
-    public int ReadInt (bool pad = true)
+    public int ReadInt(bool pad = true)
     {
         if (pad)
         {
@@ -100,7 +98,7 @@ public class MemoryReader : IDisposable
         return m_buffer[0] | m_buffer[1] << 8 | m_buffer[2] << 16 | m_buffer[3] << 24;
     }
 
-    public uint ReadUInt (bool pad = true)
+    public uint ReadUInt(bool pad = true)
     {
         if (pad)
         {
@@ -111,7 +109,7 @@ public class MemoryReader : IDisposable
         return (uint)(m_buffer[0] | m_buffer[1] << 8 | m_buffer[2] << 16 | m_buffer[3] << 24);
     }
 
-    public long ReadLong (bool pad = true)
+    public long ReadLong(bool pad = true)
     {
         if (pad)
         {
@@ -123,7 +121,7 @@ public class MemoryReader : IDisposable
                (long)(uint)(m_buffer[0] | m_buffer[1] << 8 | m_buffer[2] << 16 | m_buffer[3] << 24);
     }
 
-    public ulong ReadULong (bool pad = true)
+    public ulong ReadULong(bool pad = true)
     {
         if (pad)
         {
@@ -135,7 +133,7 @@ public class MemoryReader : IDisposable
                (ulong)(uint)(m_buffer[0] | m_buffer[1] << 8 | m_buffer[2] << 16 | m_buffer[3] << 24);
     }
 
-    public Guid ReadGuid (bool pad = true)
+    public Guid ReadGuid(bool pad = true)
     {
         if (pad)
         {
@@ -144,12 +142,12 @@ public class MemoryReader : IDisposable
 
         FillBuffer(16);
         return new Guid(new byte[] {
-            m_buffer[0], m_buffer[1], m_buffer[2], m_buffer[3], m_buffer[4], m_buffer[5], m_buffer[6], m_buffer[7],
-            m_buffer[8], m_buffer[9], m_buffer[10], m_buffer[11], m_buffer[12], m_buffer[13], m_buffer[14], m_buffer[15]
-        });
+                    m_buffer[0], m_buffer[1], m_buffer[2], m_buffer[3], m_buffer[4], m_buffer[5], m_buffer[6], m_buffer[7],
+                    m_buffer[8], m_buffer[9], m_buffer[10], m_buffer[11], m_buffer[12], m_buffer[13], m_buffer[14], m_buffer[15]
+                });
     }
 
-    public string ReadNullTerminatedString (bool pad = true)
+    public string ReadNullTerminatedString(bool pad = true)
     {
         if (pad)
         {
@@ -176,7 +174,7 @@ public class MemoryReader : IDisposable
         return sb.ToString();
     }
 
-    public byte[]? ReadBytes (int numBytes)
+    public byte[]? ReadBytes(int numBytes)
     {
         byte[] outBuffer = new byte[numBytes];
 
@@ -195,7 +193,7 @@ public class MemoryReader : IDisposable
         return outBuffer;
     }
 
-    public unsafe IList<long> Scan (string pattern)
+    public unsafe IList<long> Scan(string pattern)
     {
         List<long> retList = new List<long>();
         pattern = pattern.Replace(" ", "");
@@ -204,12 +202,7 @@ public class MemoryReader : IDisposable
         for (int i = 0; i < bytePattern.Length; i++)
         {
             string str = pattern.Substring(i * 2, 2);
-            bytePattern[i] = new PatternType() {
-                IsWildcard = (str == "??"),
-                Value = (str != "??")
-                    ? byte.Parse(pattern.Substring(i * 2, 2), System.Globalization.NumberStyles.HexNumber)
-                    : (byte)0x00
-            };
+            bytePattern[i] = new PatternType() { IsWildcard = (str == "??"), Value = (str != "??") ? byte.Parse(pattern.Substring(i * 2, 2), System.Globalization.NumberStyles.HexNumber) : (byte)0x00 };
         }
 
         bool bFound = false;
@@ -265,7 +258,7 @@ public class MemoryReader : IDisposable
         return retList;
     }
 
-    protected virtual void FillBuffer (int numBytes)
+    protected virtual void FillBuffer(int numBytes)
     {
         uint oldProtect = 0;
         int bytesRead = 0;

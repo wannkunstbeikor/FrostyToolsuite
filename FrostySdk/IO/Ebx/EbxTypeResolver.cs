@@ -5,14 +5,14 @@ internal class EbxTypeResolver
     private readonly EbxTypeDescriptor[] m_typeDescriptors;
     private readonly EbxFieldDescriptor[] m_fieldDescriptors;
 
-    internal EbxTypeResolver (EbxTypeDescriptor[] inTypeDescriptors, EbxFieldDescriptor[] inFieldDescriptors)
+    internal EbxTypeResolver(EbxTypeDescriptor[] inTypeDescriptors, EbxFieldDescriptor[] inFieldDescriptors)
     {
         EbxSharedTypeDescriptors.Initialize();
         m_typeDescriptors = inTypeDescriptors;
         m_fieldDescriptors = inFieldDescriptors;
     }
 
-    public EbxTypeDescriptor ResolveType (int index)
+    public EbxTypeDescriptor ResolveType(int index)
     {
         EbxTypeDescriptor typeDescriptor = m_typeDescriptors[index];
         if (typeDescriptor.IsSharedTypeDescriptorKey())
@@ -23,7 +23,7 @@ internal class EbxTypeResolver
         return typeDescriptor;
     }
 
-    public EbxTypeDescriptor ResolveType (EbxTypeDescriptor typeDescriptor, int index)
+    public EbxTypeDescriptor ResolveType(EbxTypeDescriptor typeDescriptor, int index)
     {
         if (typeDescriptor.IsSharedTypeDescriptorKey())
         {
@@ -33,7 +33,7 @@ internal class EbxTypeResolver
         return m_typeDescriptors[index];
     }
 
-    public virtual EbxFieldDescriptor ResolveField (int index)
+    public virtual EbxFieldDescriptor ResolveField(int index)
     {
         if (m_fieldDescriptors.Length == 0)
         {

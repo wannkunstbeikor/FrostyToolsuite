@@ -8,13 +8,13 @@
         Title="ProfileTaskWindow"
         x:DataType="vm:ProfileTaskWindowViewModel"
         x:CompileBindings="True">
-
-  <Grid>
-    <Grid.RowDefinitions>
-      <RowDefinition Height="*" />
-      <RowDefinition Height="*" />
-    </Grid.RowDefinitions>
-    <ProgressBar Grid.Row="0" Value="{Binding Progress}" Minimum="0" Maximum="1" />
-    <TextBlock Grid.Row="1" Text="{Binding Info}" />
-  </Grid>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <ProgressBar Grid.Row="0" Value="{Binding Progress}" Minimum="0" Maximum="1" />
+        <TextBlock Grid.Row="1" Text="{Binding Info}" />
+    </Grid>
 </Window>

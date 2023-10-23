@@ -6,7 +6,7 @@ namespace FrostyEditor.Views.Windows;
 
 public partial class ProfileTaskWindow : Window
 {
-    public ProfileTaskWindow ()
+    public ProfileTaskWindow()
     {
         InitializeComponent();
 #if DEBUG
@@ -14,7 +14,7 @@ public partial class ProfileTaskWindow : Window
 #endif
     }
 
-    private void InitializeComponent ()
+    private void InitializeComponent()
     {
         AvaloniaXamlLoader.Load(this);
     }

@@ -6,9 +6,5 @@ namespace Frosty.Sdk.Attributes;
 public class NameHashAttribute : Attribute
 {
     public uint Hash { get; }
-
-    public NameHashAttribute (uint inHash)
-    {
-        Hash = inHash;
-    }
+    public NameHashAttribute(uint inHash) { Hash = inHash; }
 }

@@ -17,15 +17,23 @@ public class DockFactory : Factory
     private IDocumentDock? m_documentDock;
     private ITool? m_findTool;
 
-    public override IDocumentDock CreateDocumentDock () => new FilesDocumentDock();
+    public override IDocumentDock CreateDocumentDock() => new FilesDocumentDock();
 
-    public override IRootDock CreateLayout ()
+    public override IRootDock CreateLayout()
     {
-        DefaultPageViewModel untitledFileViewModel = new() { Title = "Home" };
+        DefaultPageViewModel untitledFileViewModel = new()
+        {
+            Title = "Home"
+        };
 
-        DataExplorerViewModel dataExplorerViewModel = new() { Id = "Data Explorer", Title = "Data Explorer" };
+        DataExplorerViewModel dataExplorerViewModel = new()
+        {
+            Id = "Data Explorer",
+            Title = "Data Explorer"
+        };
 
-        FilesDocumentDock documentDock = new() {
+        FilesDocumentDock documentDock = new()
+        {
             Id = "Files",
             Title = "Files",
             IsCollapsable = false,
@@ -38,12 +46,14 @@ public class DockFactory : Factory
             CanCreateDocument = false
         };
 
-        ProportionalDock tools = new() {
+        ProportionalDock tools = new()
+        {
             Proportion = 0.2,
             Orientation = Orientation.Vertical,
             VisibleDockables = CreateList<IDockable>
             (
-                new ToolDock {
+                new ToolDock
+                {
                     ActiveDockable = dataExplorerViewModel,
                     VisibleDockables = CreateList<IDockable>
                     (
@@ -57,7 +67,8 @@ public class DockFactory : Factory
 
         IRootDock windowLayout = CreateRootDock();
         windowLayout.Title = "Default";
-        ProportionalDock windowLayoutContent = new() {
+        ProportionalDock windowLayoutContent = new()
+        {
             Orientation = Orientation.Horizontal,
             IsCollapsable = false,
             VisibleDockables = CreateList<IDockable>
@@ -85,16 +96,24 @@ public class DockFactory : Factory
         return rootDock;
     }
 
-    public override void InitLayout (IDockable layout)
+    public override void InitLayout(IDockable layout)
     {
-        ContextLocator = new Dictionary<string, Func<object?>> { ["Find"] = () => layout };
-
-        DockableLocator = new Dictionary<string, Func<IDockable?>> {
-            ["Root"] = () => m_rootDock, ["Files"] = () => m_documentDock, ["Data Explorer"] = () => m_findTool
+        ContextLocator = new Dictionary<string, Func<object?>>
+        {
+            ["Find"] = () => layout
         };
 
-        HostWindowLocator =
-            new Dictionary<string, Func<IHostWindow?>> { [nameof(IDockWindow)] = () => new HostWindow() };
+        DockableLocator = new Dictionary<string, Func<IDockable?>>
+        {
+            ["Root"] = () => m_rootDock,
+            ["Files"] = () => m_documentDock,
+            ["Data Explorer"] = () => m_findTool
+        };
+
+        HostWindowLocator = new Dictionary<string, Func<IHostWindow?>>
+        {
+            [nameof(IDockWindow)] = () => new HostWindow()
+        };
 
         base.InitLayout(layout);
     }

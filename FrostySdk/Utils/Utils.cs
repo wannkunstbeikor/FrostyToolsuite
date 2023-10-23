@@ -9,11 +9,11 @@ namespace Frosty.Sdk.Utils;
 
 public static class Utils
 {
-    public static int HashString (string value, bool toLower = false)
+    public static int HashString(string value, bool toLower = false)
     {
         const uint kOffset = 5381;
         const uint kPrime = 33;
-
+        
         uint hash = kOffset;
         for (int i = 0; i < value.Length; i++)
         {
@@ -22,13 +22,13 @@ public static class Utils
 
         return (int)hash;
     }
-
-    public static Guid GenerateDeterministicGuid (IEnumerable<object> objects, string type, Guid fileGuid)
+    
+    public static Guid GenerateDeterministicGuid(IEnumerable<object> objects, string type, Guid fileGuid)
     {
         return GenerateDeterministicGuid(objects, TypeLibrary.GetType(type)!, fileGuid);
     }
 
-    public static Guid GenerateDeterministicGuid (IEnumerable<object> objects, Type type, Guid fileGuid)
+    public static Guid GenerateDeterministicGuid(IEnumerable<object> objects, Type type, Guid fileGuid)
     {
         Guid outGuid;
 
@@ -40,7 +40,7 @@ public static class Utils
             existingGuids.Add(objGuid.ExportedGuid);
             createCount++;
         }
-
+        
         Block<byte> buffer = new(stackalloc byte[20]);
 
         Span<byte> result = stackalloc byte[16];
@@ -61,13 +61,13 @@ public static class Utils
                 break;
             }
         }
-
+        
         buffer.Dispose();
 
         return outGuid;
     }
 
-    public static Sha1 GenerateSha1 (ReadOnlySpan<byte> buffer)
+    public static Sha1 GenerateSha1(ReadOnlySpan<byte> buffer)
     {
         Span<byte> hashed = stackalloc byte[20];
         SHA1.HashData(buffer, hashed);
@@ -75,7 +75,7 @@ public static class Utils
         return newSha1;
     }
 
-    public static ulong GenerateResourceId ()
+    public static ulong GenerateResourceId()
     {
         Random random = new();
 
@@ -90,6 +90,7 @@ public static class Utils
         {
             random.NextBytes(buf);
             ulongRand = BinaryPrimitives.ReadUInt64LittleEndian(buf);
+
         } while (ulongRand > max - (max % uRange + 1) % uRange);
 
         return (ulongRand % uRange + min) | 1;

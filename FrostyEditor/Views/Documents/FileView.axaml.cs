@@ -4,7 +4,7 @@ namespace FrostyEditor.Views.Documents;
 
 public partial class FileView : UserControl
 {
-    public FileView ()
+    public FileView()
     {
         InitializeComponent();
     }

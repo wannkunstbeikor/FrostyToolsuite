@@ -9,7 +9,7 @@ public abstract class AssetEntry
     /// The name of this <see cref="AssetEntry"/>.
     /// </summary>
     public virtual string Name { get; internal set; } = string.Empty;
-
+    
     /// <summary>
     /// The Type of this <see cref="AssetEntry"/>.
     /// </summary>
@@ -19,24 +19,26 @@ public abstract class AssetEntry
     /// The AssetType of this <see cref="AssetEntry"/>.
     /// </summary>
     public virtual string AssetType => string.Empty;
-
+    
     /// <summary>
     /// The Filename of this <see cref="AssetEntry"/>.
     /// </summary>
     public virtual string Filename
     {
-        get {
+        get
+        {
             int id = Name.LastIndexOf('/');
             return id == -1 ? Name : Name[(id + 1)..];
         }
     }
-
+    
     /// <summary>
     /// The Path of this <see cref="AssetEntry"/>.
     /// </summary>
     public virtual string Path
     {
-        get {
+        get
+        {
             int id = Name.LastIndexOf('/');
             return id == -1 ? string.Empty : Name[..id];
         }
@@ -67,7 +69,7 @@ public abstract class AssetEntry
     /// </summary>
     internal readonly HashSet<IFileInfo> FileInfos = new();
 
-    protected AssetEntry (Sha1 inSha1, long inSize, long inOriginalSize)
+    protected AssetEntry(Sha1 inSha1, long inSize, long inOriginalSize)
     {
         Sha1 = inSha1;
         Size = inSize;
@@ -79,10 +81,10 @@ public abstract class AssetEntry
     /// </summary>
     /// <param name="bid">The Id of the Bundle.</param>
     /// <returns></returns>
-    public bool IsInBundle (int bid) => Bundles.Contains(bid);
+    public bool IsInBundle(int bid) => Bundles.Contains(bid);
 
     /// <summary>
     /// Iterates through all bundles that the asset is a part of
     /// </summary>
-    public IEnumerable<int> EnumerateBundles () => Bundles;
+    public IEnumerable<int> EnumerateBundles() => Bundles;
 }

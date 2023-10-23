@@ -8,28 +8,26 @@ namespace Frosty.Sdk.Sdk;
 
 internal class FieldInfo : IComparable
 {
-    public string GetName () => m_name;
-    public TypeInfo GetTypeInfo () => TypeInfo.TypeInfoMapping[p_typeInfo];
-    public int GetEnumValue () => (int)p_typeInfo;
+    public string GetName() => m_name;
+    public TypeInfo GetTypeInfo() => TypeInfo.TypeInfoMapping[p_typeInfo];
+    public int GetEnumValue() => (int)p_typeInfo;
 
     private string m_name = string.Empty;
     private uint m_nameHash;
     private TypeFlags m_flags;
     private ushort m_offset;
     private long p_typeInfo;
-
-    public void Read (MemoryReader reader, uint classHash)
+    
+    public void Read(MemoryReader reader, uint classHash)
     {
         if (!ProfilesLibrary.HasStrippedTypeNames)
         {
             m_name = reader.ReadNullTerminatedString();
         }
-
         if (TypeInfo.Version > 4)
         {
             m_nameHash = reader.ReadUInt();
         }
-
         m_flags = reader.ReadUShort();
         m_offset = reader.ReadUShort();
 
@@ -52,7 +50,7 @@ internal class FieldInfo : IComparable
         }
     }
 
-    public void CreateField (StringBuilder sb)
+    public void CreateField(StringBuilder sb)
     {
         TypeInfo type = GetTypeInfo();
         string typeName = type.GetName();
@@ -64,7 +62,7 @@ internal class FieldInfo : IComparable
             typeName = "PointerRef";
             isClass = true;
         }
-
+        
         if (type is ArrayInfo arrayInfo)
         {
             type = arrayInfo.GetTypeInfo();
@@ -74,22 +72,19 @@ internal class FieldInfo : IComparable
                 typeName = "PointerRef";
                 isClass = true;
             }
-
             typeName = $"List<{typeName}>";
             sb.AppendLine($"[{nameof(EbxArrayMetaAttribute)}({(ushort)type.GetFlags()})]");
         }
-
-        sb.AppendLine(
-            $"[{nameof(EbxFieldMetaAttribute)}({(ushort)flags}, {m_offset}, {(isClass ? $"typeof({type.GetName()})" : "null")})]");
+        sb.AppendLine($"[{nameof(EbxFieldMetaAttribute)}({(ushort)flags}, {m_offset}, {(isClass ? $"typeof({type.GetName()})" : "null")})]");
         if (m_nameHash != 0)
         {
             sb.AppendLine($"[{nameof(NameHashAttribute)}({m_nameHash})]");
         }
-
+        
         sb.AppendLine($"private {typeName} _{m_name};");
     }
 
-    public int CompareTo (object? obj)
+    public int CompareTo(object? obj)
     {
         return m_offset.CompareTo((obj as FieldInfo)!.m_offset);
     }

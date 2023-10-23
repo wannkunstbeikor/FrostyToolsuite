@@ -19,19 +19,19 @@ public partial class FolderTreeNodeModel : ObservableObject
 
     [ObservableProperty]
     private string m_name;
-
+    
     [ObservableProperty]
     private bool m_hasChildren;
-
+    
     [ObservableProperty]
     private bool m_isExpanded;
 
-    public FolderTreeNodeModel (string inName)
+    public FolderTreeNodeModel(string inName)
     {
         Name = inName;
     }
-
-    public static FolderTreeNodeModel Create ()
+    
+    public static FolderTreeNodeModel Create()
     {
         FolderTreeNodeModel root = new("ROOT") { IsExpanded = true };
 
@@ -59,22 +59,21 @@ public partial class FolderTreeNodeModel : ObservableObject
                 {
                     folder = current.m_children[current.m_childrenMap[hash]];
                 }
-
                 current = folder;
             }
 
             current.Assets.Add(asset);
         }
-
+        
         return root;
     }
 
-    public bool Equals (FolderTreeNodeModel other)
+    public bool Equals(FolderTreeNodeModel other)
     {
         return Name.Equals(other.Name, StringComparison.OrdinalIgnoreCase);
     }
-
-    public override bool Equals (object? obj)
+    
+    public override bool Equals(object? obj)
     {
         if (obj is FolderTreeNodeModel b)
         {
@@ -84,14 +83,15 @@ public partial class FolderTreeNodeModel : ObservableObject
         return false;
     }
 
-    public override int GetHashCode ()
+    public override int GetHashCode()
     {
         return Name.GetHashCode();
     }
 
-    public static Comparison<FolderTreeNodeModel?> SortAscending<T> (Func<FolderTreeNodeModel, T> selector)
+    public static Comparison<FolderTreeNodeModel?> SortAscending<T>(Func<FolderTreeNodeModel, T> selector)
     {
-        return (x, y) => {
+        return (x, y) =>
+        {
             if (x is null && y is null)
                 return 0;
             if (x is null)
@@ -103,9 +103,10 @@ public partial class FolderTreeNodeModel : ObservableObject
         };
     }
 
-    public static Comparison<FolderTreeNodeModel?> SortDescending<T> (Func<FolderTreeNodeModel, T> selector)
+    public static Comparison<FolderTreeNodeModel?> SortDescending<T>(Func<FolderTreeNodeModel, T> selector)
     {
-        return (x, y) => {
+        return (x, y) =>
+        {
             if (x is null && y is null)
                 return 0;
             if (x is null)

@@ -4,7 +4,7 @@ namespace FrostyEditor.Views.Documents;
 
 public partial class DefaultPageView : UserControl
 {
-    public DefaultPageView ()
+    public DefaultPageView()
     {
         InitializeComponent();
     }

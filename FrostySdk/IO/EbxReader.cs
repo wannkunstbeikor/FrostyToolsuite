@@ -10,14 +10,15 @@ using Frosty.Sdk.Sdk;
 
 namespace Frosty.Sdk.IO;
 
+
 public class EbxReader : DataStream
 {
-    public static EbxReader CreateProjectReader (Stream inStream)
+    public static EbxReader CreateProjectReader(Stream inStream)
     {
         return new EbxReader(inStream);
     }
 
-    public static EbxReader CreateReader (Stream inStream)
+    public static EbxReader CreateReader(Stream inStream)
     {
         return ProfilesLibrary.EbxVersion == 6 ? new EbxReaderRiff(inStream) : new EbxReader(inStream);
     }
@@ -47,7 +48,7 @@ public class EbxReader : DataStream
 
     private readonly EbxTypeResolver m_typeResolver;
 
-    public EbxReader (Stream inStream)
+    public EbxReader(Stream inStream)
         : base(inStream)
     {
         m_magic = (EbxVersion)ReadUInt32();
@@ -86,10 +87,14 @@ public class EbxReader : DataStream
             Pad(16);
         }
 
-        m_imports = new EbxImportReference[importCount];
+        m_imports = new EbxImportReference[importCount]; 
         for (int i = 0; i < importCount; i++)
         {
-            EbxImportReference import = new() { FileGuid = ReadGuid(), ClassGuid = ReadGuid() };
+            EbxImportReference import = new()
+            {
+                FileGuid = ReadGuid(),
+                ClassGuid = ReadGuid()
+            };
 
             m_imports[i] = (import);
             m_dependencies.Add(import.FileGuid);
@@ -109,7 +114,8 @@ public class EbxReader : DataStream
         m_fieldDescriptors = new EbxFieldDescriptor[fieldDescriptorCount];
         for (int i = 0; i < fieldDescriptorCount; i++)
         {
-            EbxFieldDescriptor fieldDescriptor = new() {
+            EbxFieldDescriptor fieldDescriptor = new()
+            {
                 NameHash = ReadUInt32(),
                 Flags = ReadUInt16(),
                 TypeDescriptorRef = ReadUInt16(),
@@ -117,9 +123,7 @@ public class EbxReader : DataStream
                 SecondOffset = ReadUInt32(),
             };
 
-            fieldDescriptor.Name = typeNames.TryGetValue((int)fieldDescriptor.NameHash, out string? value)
-                ? value
-                : string.Empty;
+            fieldDescriptor.Name = typeNames.TryGetValue((int)fieldDescriptor.NameHash, out string? value) ? value : string.Empty;
 
             m_fieldDescriptors[i] = fieldDescriptor;
         }
@@ -127,7 +131,8 @@ public class EbxReader : DataStream
         m_typeDescriptors = new EbxTypeDescriptor[typeDescriptorCount];
         for (int i = 0; i < typeDescriptorCount; i++)
         {
-            EbxTypeDescriptor typeDescriptor = new() {
+            EbxTypeDescriptor typeDescriptor = new()
+            {
                 NameHash = ReadUInt32(),
                 FieldIndex = ReadInt32(),
                 FieldCount = ReadByte(),
@@ -137,9 +142,7 @@ public class EbxReader : DataStream
                 SecondSize = ReadUInt16()
             };
 
-            typeDescriptor.Name = typeNames.TryGetValue((int)typeDescriptor.NameHash, out string? value)
-                ? value
-                : string.Empty;
+            typeDescriptor.Name = typeNames.TryGetValue((int)typeDescriptor.NameHash, out string? value) ? value : string.Empty;
 
             m_typeDescriptors[i] = typeDescriptor;
         }
@@ -149,7 +152,11 @@ public class EbxReader : DataStream
         m_instances = new EbxInstance[instanceCount];
         for (int i = 0; i < instanceCount; i++)
         {
-            EbxInstance inst = new() { TypeDescriptorRef = ReadUInt16(), Count = ReadUInt16() };
+            EbxInstance inst = new()
+            {
+                TypeDescriptorRef = ReadUInt16(),
+                Count = ReadUInt16()
+            };
 
             if (i < exportedCount)
             {
@@ -164,7 +171,12 @@ public class EbxReader : DataStream
         m_arrays = new EbxArray[arrayCount];
         for (int i = 0; i < arrayCount; i++)
         {
-            m_arrays[i] = new EbxArray { Offset = ReadUInt32(), Count = ReadUInt32(), TypeDescriptorRef = ReadInt32() };
+            m_arrays[i] = new EbxArray
+            {
+                Offset = ReadUInt32(),
+                Count = ReadUInt32(),
+                TypeDescriptorRef = ReadInt32()
+            };
         }
 
         Pad(16);
@@ -172,8 +184,11 @@ public class EbxReader : DataStream
         m_boxedValues = new EbxBoxedValue[boxedValuesCount];
         for (int i = 0; i < boxedValuesCount; i++)
         {
-            m_boxedValues[i] = new EbxBoxedValue {
-                Offset = ReadUInt32(), TypeDescriptorRef = ReadUInt16(), Type = ReadUInt16()
+            m_boxedValues[i] = new EbxBoxedValue
+            {
+                Offset = ReadUInt32(),
+                TypeDescriptorRef = ReadUInt16(),
+                Type = ReadUInt16()
             };
         }
 
@@ -181,7 +196,7 @@ public class EbxReader : DataStream
         m_isValid = true;
     }
 
-    public T ReadAsset<T> () where T : EbxAsset, new()
+    public T ReadAsset<T>() where T : EbxAsset, new()
     {
         T asset = new();
         InternalReadObjects();
@@ -194,19 +209,19 @@ public class EbxReader : DataStream
         return asset;
     }
 
-    public dynamic ReadObject ()
+    public dynamic ReadObject()
     {
         InternalReadObjects();
         return m_objects[0];
     }
 
-    public List<object> ReadObjects ()
+    public List<object> ReadObjects()
     {
         InternalReadObjects();
         return m_objects;
     }
 
-    protected virtual void InternalReadObjects ()
+    protected virtual void InternalReadObjects()
     {
         foreach (EbxInstance inst in m_instances)
         {
@@ -246,7 +261,7 @@ public class EbxReader : DataStream
         }
     }
 
-    protected virtual void ReadClass (EbxTypeDescriptor classType, object? obj, long startOffset)
+    protected virtual void ReadClass(EbxTypeDescriptor classType, object? obj, long startOffset)
     {
         if (obj == null)
         {
@@ -254,7 +269,6 @@ public class EbxReader : DataStream
             Pad(classType.GetAlignment());
             return;
         }
-
         Type objType = obj.GetType();
 
         for (int j = 0; j < classType.GetFieldCount(); j++)
@@ -284,20 +298,17 @@ public class EbxReader : DataStream
                     for (int i = 0; i < array.Count; i++)
                     {
                         EbxFieldDescriptor arrayField = m_typeResolver.ResolveField(arrayType.FieldIndex);
-                        object value = ReadField(arrayType, arrayField.Flags.GetTypeEnum(),
-                            arrayField.TypeDescriptorRef);
+                        object value = ReadField(arrayType, arrayField.Flags.GetTypeEnum(), arrayField.TypeDescriptorRef);
 
                         try
                         {
-                            fieldProp?.GetValue(obj)?.GetType().GetMethod("Add")
-                                ?.Invoke(fieldProp.GetValue(obj), new[] { value });
+                            fieldProp?.GetValue(obj)?.GetType().GetMethod("Add")?.Invoke(fieldProp.GetValue(obj), new[] { value });
                         }
                         catch (Exception)
                         {
                             // ignored
                         }
                     }
-
                     Position = arrayPos;
                 }
                 else
@@ -319,7 +330,7 @@ public class EbxReader : DataStream
         Pad(classType.GetAlignment());
     }
 
-    protected object ReadField (EbxTypeDescriptor? parentClass, TypeFlags.TypeEnum fieldType, ushort fieldClassRef)
+    protected object ReadField(EbxTypeDescriptor? parentClass, TypeFlags.TypeEnum fieldType, ushort fieldClassRef)
     {
         switch (fieldType)
         {
@@ -363,9 +374,7 @@ public class EbxReader : DataStream
             case TypeFlags.TypeEnum.BoxedValueRef:
                 return ReadBoxedValueRef();
             case TypeFlags.TypeEnum.Struct:
-                EbxTypeDescriptor structType = parentClass.HasValue
-                    ? m_typeResolver.ResolveType(parentClass.Value, fieldClassRef)
-                    : m_typeResolver.ResolveType(fieldClassRef);
+                EbxTypeDescriptor structType = parentClass.HasValue ? m_typeResolver.ResolveType(parentClass.Value, fieldClassRef) : m_typeResolver.ResolveType(fieldClassRef);
                 Pad(structType.GetAlignment());
                 object structObj = CreateObject(structType);
                 ReadClass(structType, structObj, Position);
@@ -381,18 +390,16 @@ public class EbxReader : DataStream
         }
     }
 
-    protected virtual PropertyInfo? GetProperty (Type objType, EbxFieldDescriptor field)
+    protected virtual PropertyInfo? GetProperty(Type objType, EbxFieldDescriptor field)
     {
-        return objType.GetProperties()
-            .FirstOrDefault((pi) => pi.GetCustomAttribute<NameHashAttribute>()?.Hash == field.NameHash);
+        return objType.GetProperties().FirstOrDefault((pi) => pi.GetCustomAttribute<NameHashAttribute>()?.Hash == field.NameHash);
     }
 
-    protected virtual object CreateObject (EbxTypeDescriptor typeDescriptor) =>
-        TypeLibrary.CreateObject(typeDescriptor.NameHash)!;
+    protected virtual object CreateObject(EbxTypeDescriptor typeDescriptor) => TypeLibrary.CreateObject(typeDescriptor.NameHash)!;
 
-    protected virtual Type GetType (EbxTypeDescriptor classType) => TypeLibrary.GetType(classType.NameHash)!;
+    protected virtual Type GetType(EbxTypeDescriptor classType) => TypeLibrary.GetType(classType.NameHash)!;
 
-    protected Type GetTypeFromEbxField (EbxFieldDescriptor fieldType)
+    protected Type GetTypeFromEbxField(EbxFieldDescriptor fieldType)
     {
         switch (fieldType.Flags.GetTypeEnum())
         {
@@ -428,7 +435,7 @@ public class EbxReader : DataStream
         }
     }
 
-    protected virtual string ReadString (uint offset)
+    protected virtual string ReadString(uint offset)
     {
         if (offset == 0xFFFFFFFF)
         {
@@ -444,11 +451,11 @@ public class EbxReader : DataStream
         return retStr;
     }
 
-    protected CString ReadCString (uint offset) => new(ReadString(offset));
+    protected CString ReadCString(uint offset) => new(ReadString(offset));
 
-    protected ResourceRef ReadResourceRef () => new(ReadUInt64());
+    protected ResourceRef ReadResourceRef() => new(ReadUInt64());
 
-    protected FileRef ReadFileRef ()
+    protected FileRef ReadFileRef()
     {
         uint index = ReadUInt32();
         Position += 4;
@@ -456,10 +463,10 @@ public class EbxReader : DataStream
         return new FileRef(ReadString(index));
     }
 
-    protected virtual PointerRef ReadPointerRef ()
+    protected virtual PointerRef ReadPointerRef()
     {
         uint index = ReadUInt32();
-
+        
         if ((index >> 0x1F) == 1)
         {
             EbxImportReference import = m_imports[(int)(index & 0x7FFFFFFF)];
@@ -471,12 +478,13 @@ public class EbxReader : DataStream
         {
             return new PointerRef();
         }
-
+        
+        
 
         return new PointerRef(m_objects[(int)(index - 1)]);
     }
 
-    protected virtual TypeRef ReadTypeRef ()
+    protected virtual TypeRef ReadTypeRef()
     {
         string str = ReadString(ReadUInt32());
         Position += 4;
@@ -497,7 +505,7 @@ public class EbxReader : DataStream
         return new TypeRef(str);
     }
 
-    protected virtual BoxedValueRef ReadBoxedValueRef ()
+    protected virtual BoxedValueRef ReadBoxedValueRef()
     {
         int index = ReadInt32();
         Position += 12;
@@ -545,7 +553,6 @@ public class EbxReader : DataStream
                 value = Enum.Parse(GetType(enumClass), tmpValue.ToString()!);
             }
         }
-
         Position = pos;
 
         return new BoxedValueRef(value, (TypeFlags.TypeEnum)boxedValue.Type, subType);

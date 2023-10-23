@@ -7,7 +7,7 @@ public class SuperBundleEntry
     /// </summary>
     public string Name { get; }
 
-    public SuperBundleEntry (string inName)
+    public SuperBundleEntry(string inName)
     {
         Name = inName;
     }

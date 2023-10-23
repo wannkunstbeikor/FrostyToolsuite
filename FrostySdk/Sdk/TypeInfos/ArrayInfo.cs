@@ -4,10 +4,10 @@ namespace Frosty.Sdk.Sdk.TypeInfos;
 
 internal class ArrayInfo : TypeInfo
 {
-    public ArrayInfo (ArrayInfoData data)
+    public ArrayInfo(ArrayInfoData data)
         : base(data)
     {
     }
 
-    public TypeInfo GetTypeInfo () => (m_data as ArrayInfoData)!.GetTypeInfo();
+    public TypeInfo GetTypeInfo() => (m_data as ArrayInfoData)!.GetTypeInfo();
 }

@@ -4,7 +4,7 @@ namespace FrostyEditor.Interfaces;
 
 public interface IThemeManager
 {
-    void Initialize (Application application);
+    void Initialize(Application application);
 
-    void Switch (int index);
+    void Switch(int index);
 }

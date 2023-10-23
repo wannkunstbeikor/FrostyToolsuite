@@ -9,7 +9,7 @@ internal class DelegateInfoData : TypeInfoData
 {
     private List<ParameterInfo> m_parameterInfos = new();
 
-    public override void Read (MemoryReader reader)
+    public override void Read(MemoryReader reader)
     {
         base.Read(reader);
 
@@ -28,7 +28,7 @@ internal class DelegateInfoData : TypeInfoData
         }
     }
 
-    public override void CreateType (StringBuilder sb)
+    public override void CreateType(StringBuilder sb)
     {
         base.CreateType(sb);
 
@@ -60,8 +60,8 @@ internal class DelegateInfoData : TypeInfoData
                     }
                     else
                     {
-                    }
 
+                    }
                     returnType = typeName;
                     break;
                 case 2:
@@ -74,8 +74,8 @@ internal class DelegateInfoData : TypeInfoData
                     }
                     else
                     {
-                    }
 
+                    }
                     returnType = $"{typeName}*";
                     break;
             }

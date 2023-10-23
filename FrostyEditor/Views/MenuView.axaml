@@ -8,15 +8,15 @@
              d:DesignWidth="600" d:DesignHeight="20"
              x:DataType="vm:MenuViewModel"
              x:CompileBindings="True">
-  <Menu>
-    <MenuItem Header="{StaticResource ID_MENU_FILE}">
-
-    </MenuItem>
-    <MenuItem Header="{StaticResource ID_MENU_TOOLS}">
-
-    </MenuItem>
-    <MenuItem Header="{StaticResource ID_MENU_HELP}">
-
-    </MenuItem>
-  </Menu>
+    <Menu>
+        <MenuItem Header="{StaticResource ID_MENU_FILE}">
+      
+        </MenuItem>
+        <MenuItem Header="{StaticResource ID_MENU_TOOLS}">
+  
+        </MenuItem>
+        <MenuItem Header="{StaticResource ID_MENU_HELP}">
+  
+        </MenuItem>
+    </Menu>
 </UserControl>
